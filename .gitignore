@@ -1,0 +1,19 @@
+# Environnement virtuel
+venv/
+
+# Secrets
+.env
+
+# Base de données locale
+*.sqlite3
+
+# Python
+__pycache__/
+*.pyc
+
+# Django
+staticfiles/
+media/
+
+# Système
+.DS_Store
