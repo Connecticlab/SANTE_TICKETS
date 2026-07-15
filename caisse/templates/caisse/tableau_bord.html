@@ -2,7 +2,6 @@
 {% block title %}Tableau de bord — SanteTicket{% endblock %}
 {% block content %}
 <div class="max-w-2xl mx-auto px-4 py-4">
-
     <!-- En-tete -->
     <div class="bg-white rounded-2xl shadow-sm p-4 mb-4 flex items-center justify-between">
         <div class="flex items-center gap-2">
@@ -14,7 +13,6 @@
         </div>
         <a href="{% url 'logout' %}" class="text-sm text-gray-500 hover:text-clinique-rouge">Déconnexion</a>
     </div>
-
     {% if session %}
         <!-- Etat de la session -->
         <div class="bg-white rounded-2xl shadow-sm p-4 mb-4">
@@ -30,7 +28,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Actions -->
         <div class="grid grid-cols-2 gap-3 mb-4">
             <button class="bg-clinique-bleu text-white rounded-xl py-4 font-medium text-sm shadow-sm hover:bg-blue-700 transition">
@@ -40,7 +37,6 @@
                 🔍 Rechercher patient
             </button>
         </div>
-
         <!-- Dernieres transactions -->
         <div class="bg-white rounded-2xl shadow-sm p-4 mb-4">
             <div class="text-sm font-medium text-gray-700 mb-3">Dernières transactions</div>
@@ -61,19 +57,19 @@
             <div class="text-sm text-gray-400 text-center py-4">Aucun ticket pour l'instant</div>
             {% endfor %}
         </div>
-
         <button class="w-full bg-clinique-rouge bg-opacity-10 text-clinique-rouge border border-clinique-rouge rounded-xl py-3 font-medium text-sm">
             Clôturer la session
         </button>
-
     {% else %}
         <div class="bg-white rounded-2xl shadow-sm p-8 text-center">
             <p class="text-gray-500 mb-4">Aucune session de caisse ouverte.</p>
-            <button class="bg-clinique-bleu text-white rounded-xl py-3 px-6 font-medium text-sm">
-                Ouvrir une session
-            </button>
+            <form method="post" action="{% url 'ouvrir_session' %}">
+                {% csrf_token %}
+                <button type="submit" class="bg-clinique-bleu text-white rounded-xl py-3 px-6 font-medium text-sm">
+                    Ouvrir une session
+                </button>
+            </form>
         </div>
     {% endif %}
-
 </div>
 {% endblock %}
