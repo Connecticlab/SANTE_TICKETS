@@ -7,7 +7,7 @@
     <title>{% block title %}SanteTicket{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -17,16 +17,22 @@
                         'clinique-gris': '#F7F9FC',
                         'clinique-vert': '#6FCF97',
                         'clinique-rouge': '#E57373',
+                        'clinique-ardoise': '#475569',
+                        'clinique-encre': '#1E293B',
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
+    <style>
+        .tabular { font-variant-numeric: tabular-nums; }
+    </style>
 </head>
-<body class="bg-clinique-gris font-sans min-h-screen text-gray-800">
+<body class="bg-clinique-gris font-sans min-h-screen text-clinique-encre">
     {% block content %}{% endblock %}
 </body>
 </html>

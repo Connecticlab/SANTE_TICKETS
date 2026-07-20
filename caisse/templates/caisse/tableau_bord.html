@@ -6,23 +6,26 @@
         <div class="flex items-center gap-2">
             <span class="text-2xl">🏥</span>
             <div>
-                <div class="font-semibold text-clinique-bleu">SanteTicket</div>
-                <div class="text-xs text-gray-500">{{ request.user.get_full_name|default:request.user.username }}</div>
+                <div class="font-display font-semibold text-clinique-bleu">SanteTicket</div>
+                <div class="text-xs text-clinique-ardoise">{{ request.user.get_full_name|default:request.user.username }}</div>
             </div>
         </div>
-        <a href="{% url 'logout' %}" class="text-sm text-gray-500 hover:text-clinique-rouge">Déconnexion</a>
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="text-sm text-clinique-ardoise hover:text-clinique-rouge">Déconnexion</button>
+        </form>
     </div>
     {% if session %}
         <div class="bg-white rounded-2xl shadow-sm p-4 mb-4">
-            <div class="text-sm text-gray-500">Session ouverte depuis {{ session.date_ouverture|time:"H:i" }}</div>
+            <div class="text-sm text-clinique-ardoise">Session ouverte depuis {{ session.date_ouverture|time:"H:i" }}</div>
             <div class="flex gap-6 mt-2">
                 <div>
-                    <div class="text-2xl font-bold text-clinique-bleu">{{ tickets|length }}</div>
-                    <div class="text-xs text-gray-500">Tickets</div>
+                    <div class="text-2xl font-display font-semibold text-clinique-bleu tabular">{{ tickets|length }}</div>
+                    <div class="text-xs text-clinique-ardoise">Tickets</div>
                 </div>
                 <div>
-                    <div class="text-2xl font-bold text-clinique-vert">{{ session.total }} FCFA</div>
-                    <div class="text-xs text-gray-500">Total</div>
+                    <div class="text-2xl font-display font-semibold text-clinique-vert tabular">{{ session.total }} FCFA</div>
+                    <div class="text-xs text-clinique-ardoise">Total</div>
                 </div>
             </div>
         </div>
@@ -30,20 +33,20 @@
             <a href="{% url 'rechercher_patient' %}" class="bg-clinique-bleu text-white rounded-xl py-4 font-medium text-sm shadow-sm hover:bg-blue-700 transition text-center">
                 + Nouveau ticket
             </a>
-            <a href="{% url 'rechercher_patient' %}" class="bg-white border border-gray-200 text-gray-700 rounded-xl py-4 font-medium text-sm shadow-sm hover:bg-gray-50 transition text-center">
+            <a href="{% url 'rechercher_patient' %}" class="bg-white border border-gray-200 text-clinique-ardoise rounded-xl py-4 font-medium text-sm shadow-sm hover:bg-gray-50 transition text-center">
                 🔍 Rechercher patient
             </a>
         </div>
         <div class="bg-white rounded-2xl shadow-sm p-4 mb-4">
-            <div class="text-sm font-medium text-gray-700 mb-3">Dernières transactions</div>
+            <div class="text-sm font-medium text-clinique-ardoise mb-3">Dernières transactions</div>
             {% for ticket in tickets %}
             <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                 <div>
                     <div class="text-sm font-medium">{{ ticket.numero }}</div>
-                    <div class="text-xs text-gray-500">{{ ticket.service.nom }}</div>
+                    <div class="text-xs text-clinique-ardoise">{{ ticket.service.nom }}</div>
                 </div>
                 <div class="text-right">
-                    <div class="text-sm font-medium">{{ ticket.montant }} FCFA</div>
+                    <div class="text-sm font-medium tabular">{{ ticket.montant }} FCFA</div>
                     <div class="text-xs {% if ticket.statut_file == 'annule' %}text-gray-400{% elif ticket.statut_paiement == 'paye' %}text-clinique-vert{% else %}text-orange-500{% endif %}">
                         {% if ticket.statut_file == 'annule' %}Annulé{% else %}{{ ticket.get_statut_paiement_display }}{% endif %}
                     </div>
@@ -64,7 +67,7 @@
         </form>
     {% else %}
         <div class="bg-white rounded-2xl shadow-sm p-8 text-center">
-            <p class="text-gray-500 mb-4">Aucune session de caisse ouverte.</p>
+            <p class="text-clinique-ardoise mb-4">Aucune session de caisse ouverte.</p>
             <form method="post" action="{% url 'ouvrir_session' %}">
                 {% csrf_token %}
                 <button type="submit" class="bg-clinique-bleu text-white rounded-xl py-3 px-6 font-medium text-sm">
