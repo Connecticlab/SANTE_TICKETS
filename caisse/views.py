@@ -91,3 +91,21 @@ def nouveau_ticket(request, patient_id):
         'erreur_tarif': erreur_tarif,
     }
     return render(request, 'caisse/nouveau_ticket.html', context)
+
+
+@login_required
+@require_POST
+def cloturer_session(request):
+    session = CaisseSession.objects.filter(
+        caissier=request.user, statut='ouverte'
+    ).first()
+    if session:
+        session.cloturer()
+        enregistrer_action(
+            utilisateur=request.user,
+            action='modification',
+            modele_cible='CaisseSession',
+            objet_id=session.id,
+            details=f"Cloture de session, total: {session.total} FCFA",
+        )
+    return redirect('tableau_bord')

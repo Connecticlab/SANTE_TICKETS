@@ -53,9 +53,12 @@
             <div class="text-sm text-gray-400 text-center py-4">Aucun ticket pour l'instant</div>
             {% endfor %}
         </div>
-        <button class="w-full bg-clinique-rouge bg-opacity-10 text-clinique-rouge border border-clinique-rouge rounded-xl py-3 font-medium text-sm">
-            Clôturer la session
-        </button>
+        <form method="post" action="{% url 'cloturer_session' %}" onsubmit="return confirm('Confirmer la clôture de la session ? Cette action est définitive.');">
+            {% csrf_token %}
+            <button type="submit" class="w-full bg-clinique-rouge bg-opacity-10 text-clinique-rouge border border-clinique-rouge rounded-xl py-3 font-medium text-sm">
+                Clôturer la session
+            </button>
+        </form>
     {% else %}
         <div class="bg-white rounded-2xl shadow-sm p-8 text-center">
             <p class="text-gray-500 mb-4">Aucune session de caisse ouverte.</p>
