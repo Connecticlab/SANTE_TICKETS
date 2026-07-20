@@ -28,7 +28,16 @@ class CaisseSession(models.Model):
         verbose_name_plural = "Sessions de caisse"
         ordering = ['-date_ouverture']
 
+    def recalculer_total(self):
+        total = self.tickets.exclude(statut_file='annule').aggregate(
+            somme=models.Sum('montant')
+        )['somme'] or 0
+        self.total = total
+        self.save()
+        return self.total
+
     def cloturer(self):
+        self.recalculer_total()
         self.statut = 'cloturee'
         self.date_cloture = timezone.now()
         self.save()

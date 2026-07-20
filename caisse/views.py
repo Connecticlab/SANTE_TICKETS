@@ -83,8 +83,7 @@ def nouveau_ticket(request, patient_id):
                     statut_paiement=statut_paiement,
                 )
 
-                session.total = session.total + montant
-                session.save()
+                session.recalculer_total()
 
                 enregistrer_action(
                     utilisateur=request.user,
@@ -127,15 +126,26 @@ def cloturer_session(request):
 
 @login_required
 def annuler_ticket(request, ticket_id):
-    ticket = get_object_or_404(Ticket, id=ticket_id, session__caissier=request.user)
+    profile = getattr(request.user, 'profile', None)
+    est_admin_clinique = profile and profile.est_admin_clinique()
+
+    if est_admin_clinique:
+        ticket = get_object_or_404(Ticket, id=ticket_id)
+    else:
+        ticket = get_object_or_404(Ticket, id=ticket_id, session__caissier=request.user)
+
     delai_depasse = not ticket.peut_etre_annule_par_caissier()
 
+    if ticket.statut_file == 'annule':
+        return redirect('tableau_bord')
+
     if request.method == 'POST':
-        if delai_depasse:
+        if delai_depasse and not est_admin_clinique:
             return render(request, 'caisse/annuler_ticket.html', {
                 'ticket': ticket,
                 'delai_depasse': True,
-                'erreur': "Le délai de 5 minutes est dépassé. Seul l'Admin Clinique peut annuler ce ticket (fonctionnalité à venir).",
+                'est_admin_clinique': est_admin_clinique,
+                'erreur': "Le délai de 5 minutes est dépassé. Seul l'Admin Clinique peut annuler ce ticket.",
             })
 
         motif = request.POST.get('motif', '').strip()
@@ -152,8 +162,7 @@ def annuler_ticket(request, ticket_id):
         ticket.save()
 
         session = ticket.session
-        session.total = session.total - ancien_montant
-        session.save()
+        session.recalculer_total()
 
         enregistrer_action(
             utilisateur=request.user,
@@ -167,6 +176,7 @@ def annuler_ticket(request, ticket_id):
     return render(request, 'caisse/annuler_ticket.html', {
         'ticket': ticket,
         'delai_depasse': delai_depasse,
+        'est_admin_clinique': est_admin_clinique,
         'erreur': None,
     })
 

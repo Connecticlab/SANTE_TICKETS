@@ -1,16 +1,17 @@
 {% extends "base.html" %}
 {% block title %}Annuler un ticket — SanteTicket{% endblock %}
 {% block content %}
-<div class="max-w-2xl mx-auto px-4 py-4">
-    <div class="bg-white rounded-2xl shadow-sm p-4 mb-4 flex items-center justify-between">
-        <div class="font-semibold text-clinique-rouge">Annuler un ticket</div>
-        <a href="{% url 'tableau_bord' %}" class="text-sm text-gray-500">← Retour</a>
+{% include 'partials/nav.html' %}
+<div class="max-w-2xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-4">
+        <h1 class="font-display font-semibold text-xl text-clinique-rouge">Annuler un ticket</h1>
+        <a href="{% url 'tableau_bord' %}" class="text-sm text-clinique-ardoise hover:text-clinique-encre">← Retour</a>
     </div>
 
     <div class="bg-white rounded-2xl shadow-sm p-4 mb-4">
-        <div class="text-sm text-gray-500">Ticket</div>
-        <div class="text-lg font-semibold">{{ ticket.numero }} — {{ ticket.patient }}</div>
-        <div class="text-sm text-gray-500">{{ ticket.service.nom }} — {{ ticket.montant }} FCFA</div>
+        <div class="text-sm text-clinique-ardoise">Ticket</div>
+        <div class="text-lg font-display font-semibold text-clinique-encre">{{ ticket.numero }} — {{ ticket.patient }}</div>
+        <div class="text-sm text-clinique-ardoise">{{ ticket.service.nom }} — {{ ticket.montant }} FCFA</div>
         <div class="text-xs text-gray-400 mt-1">Émis le {{ ticket.date|date:"d/m/Y à H:i" }}</div>
     </div>
 
@@ -20,16 +21,21 @@
     </div>
     {% endif %}
 
-    {% if delai_depasse %}
+    {% if delai_depasse and not est_admin_clinique %}
         <div class="bg-orange-50 border border-orange-300 text-orange-700 text-sm rounded-lg p-3">
             Le délai de 5 minutes pour l'annulation caissier est dépassé.
-            Cette annulation nécessite une validation Admin Clinique (fonctionnalité à venir).
+            Seul un compte Admin Clinique peut annuler ce ticket.
         </div>
     {% else %}
+        {% if delai_depasse and est_admin_clinique %}
+        <div class="bg-blue-50 border border-clinique-bleu text-clinique-bleu text-sm rounded-lg p-3 mb-3">
+            Délai caissier dépassé — annulation autorisée en tant qu'Admin Clinique.
+        </div>
+        {% endif %}
         <form method="post" class="bg-white rounded-2xl shadow-sm p-4 space-y-3">
             {% csrf_token %}
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Motif d'annulation (obligatoire)</label>
+                <label class="block text-sm font-medium text-clinique-ardoise mb-1">Motif d'annulation (obligatoire)</label>
                 <textarea name="motif" rows="3" required
                           class="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-clinique-rouge"></textarea>
             </div>
