@@ -109,3 +109,49 @@ def cloturer_session(request):
             details=f"Cloture de session, total: {session.total} FCFA",
         )
     return redirect('tableau_bord')
+
+
+@login_required
+def annuler_ticket(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id, session__caissier=request.user)
+    delai_depasse = not ticket.peut_etre_annule_par_caissier()
+
+    if request.method == 'POST':
+        if delai_depasse:
+            return render(request, 'caisse/annuler_ticket.html', {
+                'ticket': ticket,
+                'delai_depasse': True,
+                'erreur': "Le délai de 5 minutes est dépassé. Seul l'Admin Clinique peut annuler ce ticket (fonctionnalité à venir).",
+            })
+
+        motif = request.POST.get('motif', '').strip()
+        if not motif:
+            return render(request, 'caisse/annuler_ticket.html', {
+                'ticket': ticket,
+                'delai_depasse': False,
+                'erreur': "Le motif d'annulation est obligatoire.",
+            })
+
+        ancien_montant = ticket.montant
+        ticket.statut_file = 'annule'
+        ticket.motif_annulation = motif
+        ticket.save()
+
+        session = ticket.session
+        session.total = session.total - ancien_montant
+        session.save()
+
+        enregistrer_action(
+            utilisateur=request.user,
+            action='annulation',
+            modele_cible='Ticket',
+            objet_id=ticket.numero,
+            details=f"Motif: {motif}",
+        )
+        return redirect('tableau_bord')
+
+    return render(request, 'caisse/annuler_ticket.html', {
+        'ticket': ticket,
+        'delai_depasse': delai_depasse,
+        'erreur': None,
+    })
