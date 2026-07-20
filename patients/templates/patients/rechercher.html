@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Rechercher un patient — SanteTicket{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-4">
+    <div class="bg-white rounded-2xl shadow-sm p-4 mb-4 flex items-center justify-between">
+        <div class="font-semibold text-clinique-bleu">🔍 Rechercher un patient</div>
+        <a href="{% url 'tableau_bord' %}" class="text-sm text-gray-500">← Retour</a>
+    </div>
+
+    <form method="post" class="bg-white rounded-2xl shadow-sm p-4 mb-4 space-y-3">
+        {% csrf_token %}
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+            {{ form.telephone }}
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Numéro de carte patient</label>
+            {{ form.numero_patient }}
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                {{ form.nom }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
+                {{ form.prenom }}
+            </div>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Date de naissance</label>
+            {{ form.date_naissance }}
+        </div>
+        <button type="submit" class="w-full bg-clinique-bleu text-white rounded-lg py-3 font-medium">
+            Rechercher
+        </button>
+    </form>
+
+    {% if recherche_effectuee %}
+        {% if resultat %}
+        <div class="bg-white rounded-2xl shadow-sm p-4 border border-clinique-vert">
+            <div class="text-sm text-clinique-vert font-medium mb-2">✓ Patient trouvé (méthode: {{ methode }})</div>
+            <div class="text-lg font-semibold">{{ resultat.prenom }} {{ resultat.nom }}</div>
+            <div class="text-sm text-gray-500">{{ resultat.numero_patient }}</div>
+            <a href="{% url 'nouveau_ticket' resultat.id %}" class="mt-3 block text-center bg-clinique-bleu text-white rounded-lg py-3 font-medium">
+                Émettre un ticket pour ce patient
+            </a>
+        </div>
+        {% else %}
+        <div class="bg-white rounded-2xl shadow-sm p-4 border border-clinique-rouge">
+            <div class="text-sm text-clinique-rouge font-medium mb-3">Aucun patient trouvé</div>
+            <a href="{% url 'creer_patient' %}" class="block text-center bg-clinique-bleu text-white rounded-lg py-3 font-medium">
+                + Créer un nouveau patient
+            </a>
+        </div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

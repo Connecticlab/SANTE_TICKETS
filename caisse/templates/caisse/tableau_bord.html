@@ -2,7 +2,6 @@
 {% block title %}Tableau de bord — SanteTicket{% endblock %}
 {% block content %}
 <div class="max-w-2xl mx-auto px-4 py-4">
-    <!-- En-tete -->
     <div class="bg-white rounded-2xl shadow-sm p-4 mb-4 flex items-center justify-between">
         <div class="flex items-center gap-2">
             <span class="text-2xl">🏥</span>
@@ -14,7 +13,6 @@
         <a href="{% url 'logout' %}" class="text-sm text-gray-500 hover:text-clinique-rouge">Déconnexion</a>
     </div>
     {% if session %}
-        <!-- Etat de la session -->
         <div class="bg-white rounded-2xl shadow-sm p-4 mb-4">
             <div class="text-sm text-gray-500">Session ouverte depuis {{ session.date_ouverture|time:"H:i" }}</div>
             <div class="flex gap-6 mt-2">
@@ -28,16 +26,14 @@
                 </div>
             </div>
         </div>
-        <!-- Actions -->
         <div class="grid grid-cols-2 gap-3 mb-4">
-            <button class="bg-clinique-bleu text-white rounded-xl py-4 font-medium text-sm shadow-sm hover:bg-blue-700 transition">
+            <a href="{% url 'rechercher_patient' %}" class="bg-clinique-bleu text-white rounded-xl py-4 font-medium text-sm shadow-sm hover:bg-blue-700 transition text-center">
                 + Nouveau ticket
-            </button>
-            <button class="bg-white border border-gray-200 text-gray-700 rounded-xl py-4 font-medium text-sm shadow-sm hover:bg-gray-50 transition">
+            </a>
+            <a href="{% url 'rechercher_patient' %}" class="bg-white border border-gray-200 text-gray-700 rounded-xl py-4 font-medium text-sm shadow-sm hover:bg-gray-50 transition text-center">
                 🔍 Rechercher patient
-            </button>
+            </a>
         </div>
-        <!-- Dernieres transactions -->
         <div class="bg-white rounded-2xl shadow-sm p-4 mb-4">
             <div class="text-sm font-medium text-gray-700 mb-3">Dernières transactions</div>
             {% for ticket in tickets %}
