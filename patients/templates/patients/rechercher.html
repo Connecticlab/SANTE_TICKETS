@@ -1,59 +1,72 @@
 {% extends "base.html" %}
-{% block title %}Rechercher un patient — SanteTicket{% endblock %}
+{% block title %}Patients — SanteTicket{% endblock %}
 {% block content %}
-<div class="max-w-2xl mx-auto px-4 py-4">
-    <div class="bg-white rounded-2xl shadow-sm p-4 mb-4 flex items-center justify-between">
-        <div class="font-semibold text-clinique-bleu">🔍 Rechercher un patient</div>
-        <a href="{% url 'tableau_bord' %}" class="text-sm text-gray-500">← Retour</a>
-    </div>
+{% include 'partials/nav.html' %}
+<div class="max-w-2xl mx-auto px-4 py-6">
+    <h1 class="font-display font-semibold text-xl text-clinique-encre mb-4">Patients</h1>
 
     <form method="post" class="bg-white rounded-2xl shadow-sm p-4 mb-4 space-y-3">
         {% csrf_token %}
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
-            {{ form.telephone }}
-        </div>
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Numéro de carte patient</label>
-            {{ form.numero_patient }}
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-medium text-clinique-ardoise mb-1">Téléphone</label>
+                {{ form.telephone }}
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-clinique-ardoise mb-1">Numéro de carte</label>
+                {{ form.numero_patient }}
+            </div>
         </div>
         <div class="grid grid-cols-2 gap-3">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                <label class="block text-xs font-medium text-clinique-ardoise mb-1">Nom</label>
                 {{ form.nom }}
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
+                <label class="block text-xs font-medium text-clinique-ardoise mb-1">Prénom</label>
                 {{ form.prenom }}
             </div>
         </div>
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Date de naissance</label>
+            <label class="block text-xs font-medium text-clinique-ardoise mb-1">Date de naissance</label>
             {{ form.date_naissance }}
         </div>
-        <button type="submit" class="w-full bg-clinique-bleu text-white rounded-lg py-3 font-medium">
+        <button type="submit" class="w-full bg-clinique-bleu text-white rounded-lg py-3 font-medium flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             Rechercher
         </button>
     </form>
 
     {% if recherche_effectuee %}
         {% if resultat %}
-        <div class="bg-white rounded-2xl shadow-sm p-4 border border-clinique-vert">
-            <div class="text-sm text-clinique-vert font-medium mb-2">✓ Patient trouvé (méthode: {{ methode }})</div>
-            <div class="text-lg font-semibold">{{ resultat.prenom }} {{ resultat.nom }}</div>
-            <div class="text-sm text-gray-500">{{ resultat.numero_patient }}</div>
-            <a href="{% url 'nouveau_ticket' resultat.id %}" class="mt-3 block text-center bg-clinique-bleu text-white rounded-lg py-3 font-medium">
-                Émettre un ticket pour ce patient
+        <div class="bg-white rounded-2xl shadow-sm p-2 mb-4">
+            <a href="{% url 'nouveau_ticket' resultat.id %}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition">
+                <div class="w-10 h-10 rounded-full bg-blue-50 text-clinique-bleu font-display font-semibold text-sm flex items-center justify-center flex-shrink-0">
+                    {{ resultat.prenom|slice:":1" }}{{ resultat.nom|slice:":1" }}
+                </div>
+                <div class="flex-1">
+                    <div class="font-medium text-clinique-encre">{{ resultat.prenom }} {{ resultat.nom }}</div>
+                    <div class="text-xs text-clinique-ardoise">{{ resultat.numero_patient }} · trouvé par {{ methode }}</div>
+                </div>
+                <svg class="w-5 h-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
             </a>
         </div>
         {% else %}
-        <div class="bg-white rounded-2xl shadow-sm p-4 border border-clinique-rouge">
-            <div class="text-sm text-clinique-rouge font-medium mb-3">Aucun patient trouvé</div>
-            <a href="{% url 'creer_patient' %}" class="block text-center bg-clinique-bleu text-white rounded-lg py-3 font-medium">
-                + Créer un nouveau patient
+        <div class="text-center text-sm text-clinique-ardoise mb-4">Aucun patient trouvé pour ces critères.</div>
+        {% endif %}
+
+        <div class="flex items-center gap-3 my-4">
+            <div class="flex-1 h-px bg-gray-200"></div>
+            <span class="text-xs text-gray-400">ou</span>
+            <div class="flex-1 h-px bg-gray-200"></div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm p-4">
+            <div class="font-display font-semibold text-clinique-encre mb-3">Nouveau patient</div>
+            <a href="{% url 'creer_patient' %}" class="block w-full bg-clinique-bleu text-white rounded-lg py-3 font-medium text-center">
+                Créer un nouveau patient
             </a>
         </div>
-        {% endif %}
     {% endif %}
 </div>
 {% endblock %}

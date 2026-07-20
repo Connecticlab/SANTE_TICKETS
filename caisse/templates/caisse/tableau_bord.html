@@ -1,36 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Tableau de bord — SanteTicket{% endblock %}
 {% block content %}
-<nav class="bg-white border-b border-gray-100">
-    <div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-14">
-        <div class="flex items-center gap-6">
-            <span class="font-display font-semibold text-clinique-bleu">SanteTicket</span>
-            <div class="hidden md:flex items-center gap-3">
-                <a href="{% url 'tableau_bord' %}" class="flex items-center gap-2 text-sm font-medium text-clinique-bleu bg-blue-50 px-3 py-1.5 rounded-lg">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-                    Accueil
-                </a>
-                <a href="#" class="flex items-center gap-2 text-sm text-clinique-ardoise hover:text-clinique-encre px-3 py-1.5 rounded-lg">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                    Tickets
-                </a>
-                <a href="{% url 'rechercher_patient' %}" class="flex items-center gap-2 text-sm text-clinique-ardoise hover:text-clinique-encre px-3 py-1.5 rounded-lg">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                    Patients
-                </a>
-            </div>
-        </div>
-        <div class="flex items-center gap-3">
-            <span class="text-sm text-clinique-ardoise">{{ request.tenant.nom_clinique|default:"Clinique" }}</span>
-            <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button type="submit" class="w-8 h-8 rounded-full bg-clinique-bleu text-white text-xs font-medium flex items-center justify-center" title="Déconnexion">
-                    {{ request.user.first_name|slice:":1"|default:request.user.username|slice:":1"|upper }}
-                </button>
-            </form>
-        </div>
-    </div>
-</nav>
+{% include 'partials/nav.html' %}
 
 <div class="max-w-6xl mx-auto px-4 py-6 min-h-[calc(100vh-56px)] flex flex-col{% if not session %} items-center justify-center{% endif %}">
     <h1 class="font-display font-semibold text-xl text-clinique-encre mb-4{% if not session %} text-center{% else %} w-full{% endif %}">Bonjour, {{ request.user.first_name|default:request.user.username }}</h1>
