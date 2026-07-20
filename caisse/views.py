@@ -169,3 +169,30 @@ def annuler_ticket(request, ticket_id):
         'delai_depasse': delai_depasse,
         'erreur': None,
     })
+
+
+@login_required
+@require_POST
+def appeler_ticket(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id, session__caissier=request.user)
+    ticket.statut_file = 'appele'
+    ticket.save()
+    enregistrer_action(
+        utilisateur=request.user,
+        action='modification',
+        modele_cible='Ticket',
+        objet_id=ticket.numero,
+        details="Ticket appele",
+    )
+    return redirect('tableau_bord')
+
+
+def ecran_appel(request):
+    ticket_appele = Ticket.objects.filter(statut_file='appele').order_by('-date').first()
+    file_attente = Ticket.objects.filter(statut_file='en_attente').order_by('date')[:5]
+    context = {
+        'ticket_appele': ticket_appele,
+        'file_attente': file_attente,
+        'clinique': getattr(request, 'tenant', None),
+    }
+    return render(request, 'caisse/ecran_appel.html', context)

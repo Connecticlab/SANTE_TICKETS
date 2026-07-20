@@ -7,4 +7,6 @@ urlpatterns = [
     path('session/cloturer/', views.cloturer_session, name='cloturer_session'),
     path('ticket/nouveau/<int:patient_id>/', views.nouveau_ticket, name='nouveau_ticket'),
     path('ticket/annuler/<int:ticket_id>/', views.annuler_ticket, name='annuler_ticket'),
+    path('ticket/appeler/<int:ticket_id>/', views.appeler_ticket, name='appeler_ticket'),
+    path('salle-attente/', views.ecran_appel, name='ecran_appel'),
 ]

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Salle d'attente — SanteTicket{% endblock %}
+{% block content %}
+<meta http-equiv="refresh" content="10">
+<div class="min-h-screen flex flex-col">
+    <div class="bg-white border-b border-gray-100 px-8 py-5 flex items-center justify-between">
+        <div class="font-display font-semibold text-xl text-clinique-encre">{{ clinique.nom_clinique|default:"Clinique" }}</div>
+        <div class="font-display font-semibold text-xl text-clinique-encre tabular" id="horloge">--:--</div>
+    </div>
+    <div class="flex-1 max-w-5xl mx-auto w-full px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm flex flex-col items-center justify-center py-16 px-8">
+            {% if ticket_appele %}
+                <div class="text-sm tracking-widest text-clinique-ardoise uppercase mb-4">Ticket appelé</div>
+                <div class="font-display font-bold text-8xl text-clinique-bleu tabular">{{ ticket_appele.numero }}</div>
+                <div class="text-xl text-clinique-encre mt-6">Veuillez vous présenter au guichet</div>
+            {% else %}
+                <div class="text-2xl text-clinique-ardoise">Aucun ticket appelé pour le moment</div>
+            {% endif %}
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-5">
+            <div class="font-display font-semibold text-clinique-encre mb-3">File d'attente</div>
+            {% for ticket in file_attente %}
+            <div class="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
+                <span class="font-display font-semibold text-clinique-encre tabular">{{ ticket.numero }}</span>
+                <span class="text-xs text-clinique-ardoise">≈ {{ forloop.counter|add:"4" }} min</span>
+            </div>
+            {% empty %}
+            <div class="text-sm text-gray-400 text-center py-6">File d'attente vide</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<script>
+function majHorloge() {
+    const maintenant = new Date();
+    const h = String(maintenant.getHours()).padStart(2, '0');
+    const m = String(maintenant.getMinutes()).padStart(2, '0');
+    document.getElementById('horloge').textContent = h + ':' + m;
+}
+majHorloge();
+setInterval(majHorloge, 1000);
+</script>
+{% endblock %}

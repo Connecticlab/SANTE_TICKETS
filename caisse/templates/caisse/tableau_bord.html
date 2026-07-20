@@ -50,6 +50,12 @@
                     {% else %}
                     <div class="text-xs text-orange-800 bg-orange-100 px-2 py-0.5 rounded-full mt-1">{{ ticket.get_statut_paiement_display }}</div>
                     {% endif %}
+                    {% if ticket.statut_file == 'en_attente' %}
+                    <form method="post" action="{% url 'appeler_ticket' ticket.id %}" class="mt-1">
+                        {% csrf_token %}
+                        <button type="submit" class="text-xs text-clinique-bleu hover:underline">Appeler</button>
+                    </form>
+                    {% endif %}
                     {% if ticket.statut_file != 'annule' %}
                     <a href="{% url 'annuler_ticket' ticket.id %}" class="text-xs text-clinique-rouge hover:underline mt-1">Annuler</a>
                     {% endif %}
