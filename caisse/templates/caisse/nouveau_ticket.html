@@ -1,16 +1,22 @@
 {% extends "base.html" %}
 {% block title %}Nouveau ticket — SanteTicket{% endblock %}
 {% block content %}
-<div class="max-w-2xl mx-auto px-4 py-4">
-    <div class="bg-white rounded-2xl shadow-sm p-4 mb-4 flex items-center justify-between">
-        <div class="font-semibold text-clinique-bleu">+ Nouveau ticket</div>
-        <a href="{% url 'tableau_bord' %}" class="text-sm text-gray-500">← Retour</a>
+{% include 'partials/nav.html' %}
+<div class="max-w-2xl mx-auto px-4 py-6 pb-28">
+    <div class="flex items-center justify-between mb-4">
+        <h1 class="font-display font-semibold text-xl text-clinique-encre">Nouveau ticket</h1>
+        <a href="{% url 'tableau_bord' %}" class="text-sm text-clinique-ardoise hover:text-clinique-encre">← Retour</a>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-sm p-4 mb-4">
-        <div class="text-sm text-gray-500">Patient</div>
-        <div class="text-lg font-semibold">{{ patient.prenom }} {{ patient.nom }}</div>
-        <div class="text-sm text-gray-500">{{ patient.numero_patient }} — {{ patient.get_categorie_display }}</div>
+    <div class="bg-white rounded-2xl shadow-sm p-3 mb-4 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-blue-50 text-clinique-bleu font-display font-semibold text-sm flex items-center justify-center flex-shrink-0">
+            {{ patient.prenom|slice:":1" }}{{ patient.nom|slice:":1" }}
+        </div>
+        <div class="flex-1">
+            <span class="font-medium text-clinique-encre">{{ patient.prenom }} {{ patient.nom }}</span>
+            <span class="text-clinique-ardoise text-sm"> · {{ patient.telephone|default:patient.numero_patient }}</span>
+        </div>
+        <a href="{% url 'rechercher_patient' %}" class="text-sm text-clinique-bleu">Changer</a>
     </div>
 
     {% if erreur_tarif %}
@@ -19,15 +25,49 @@
     </div>
     {% endif %}
 
-    <form method="post" class="bg-white rounded-2xl shadow-sm p-4 space-y-3">
+    <div class="text-sm text-clinique-ardoise mb-2">Choisir un service</div>
+    <form method="post" id="ticket-form">
         {% csrf_token %}
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Service médical</label>
-            {{ form.service }}
+        <div class="space-y-2">
+        {% for item in services_avec_tarif %}
+        <label class="service-card flex items-center justify-between bg-white rounded-xl p-4 shadow-sm border-2 border-transparent cursor-pointer transition">
+            <span class="text-clinique-encre">{{ item.service.nom }}</span>
+            <span class="flex items-center gap-3">
+                <span class="font-display font-semibold text-clinique-encre tabular">{% if item.gratuit %}Gratuit{% else %}{{ item.montant }} FCFA{% endif %}</span>
+                <input type="radio" name="service" value="{{ item.service.id }}" data-montant="{{ item.montant }}"
+                       class="w-5 h-5 text-clinique-bleu focus:ring-clinique-bleu" {% if forloop.first %}checked{% endif %} required>
+            </span>
+        </label>
+        {% empty %}
+        <div class="bg-white rounded-2xl shadow-sm text-sm text-gray-400 text-center py-6">Aucun service disponible pour cette catégorie de patient.</div>
+        {% endfor %}
         </div>
-        <button type="submit" class="w-full bg-clinique-bleu text-white rounded-lg py-3 font-medium">
-            Émettre le ticket
-        </button>
+
+        <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100">
+            <div class="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+                <div>
+                    <div class="text-xs text-clinique-ardoise">Total</div>
+                    <div class="font-display font-semibold text-xl text-clinique-encre tabular" id="total-display">0 FCFA</div>
+                </div>
+                <button type="submit" class="bg-clinique-bleu text-white rounded-xl px-8 py-3 font-medium">
+                    Émettre le ticket
+                </button>
+            </div>
+        </div>
     </form>
 </div>
+<style>
+.service-card:has(input:checked) { border-color: #1A6FD4; background: #EFF6FF; }
+</style>
+<script>
+function majTotal() {
+    const checked = document.querySelector('input[name="service"]:checked');
+    const total = checked ? checked.dataset.montant : 0;
+    document.getElementById('total-display').textContent = total + ' FCFA';
+}
+document.querySelectorAll('input[name="service"]').forEach(function(radio) {
+    radio.addEventListener('change', majTotal);
+});
+document.addEventListener('DOMContentLoaded', majTotal);
+</script>
 {% endblock %}

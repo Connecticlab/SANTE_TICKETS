@@ -4,7 +4,7 @@ from django.views.decorators.http import require_POST
 from .models import CaisseSession, Ticket
 from .forms import EmissionTicketForm
 from patients.models import Patient
-from services.models import TarifService
+from services.models import TarifService, ServiceMedical
 from audit.models import enregistrer_action
 
 
@@ -48,6 +48,19 @@ def nouveau_ticket(request, patient_id):
 
     erreur_tarif = None
 
+    services_actifs = ServiceMedical.objects.filter(actif=True)
+    services_avec_tarif = []
+    for service in services_actifs:
+        tarif = TarifService.objects.filter(
+            service=service, categorie_patient=patient.categorie
+        ).order_by('-date_effet').first()
+        if tarif:
+            services_avec_tarif.append({
+                'service': service,
+                'montant': 0 if tarif.gratuit else tarif.montant,
+                'gratuit': tarif.gratuit,
+            })
+
     if request.method == 'POST':
         form = EmissionTicketForm(request.POST)
         if form.is_valid():
@@ -89,6 +102,7 @@ def nouveau_ticket(request, patient_id):
         'patient': patient,
         'form': form,
         'erreur_tarif': erreur_tarif,
+        'services_avec_tarif': services_avec_tarif,
     }
     return render(request, 'caisse/nouveau_ticket.html', context)
 
