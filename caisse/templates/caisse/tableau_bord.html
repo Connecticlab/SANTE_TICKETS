@@ -1,72 +1,97 @@
 {% extends "base.html" %}
 {% block title %}Tableau de bord — SanteTicket{% endblock %}
 {% block content %}
-<div class="max-w-2xl mx-auto px-4 py-4">
-    <div class="bg-white rounded-2xl shadow-sm p-4 mb-4 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-            <span class="text-2xl">🏥</span>
-            <div>
-                <div class="font-display font-semibold text-clinique-bleu">SanteTicket</div>
-                <div class="text-xs text-clinique-ardoise">{{ request.user.get_full_name|default:request.user.username }}</div>
+<nav class="bg-white border-b border-gray-100">
+    <div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-14">
+        <div class="flex items-center gap-6">
+            <span class="font-display font-semibold text-clinique-bleu">SanteTicket</span>
+            <div class="hidden md:flex items-center gap-3">
+                <a href="{% url 'tableau_bord' %}" class="flex items-center gap-2 text-sm font-medium text-clinique-bleu bg-blue-50 px-3 py-1.5 rounded-lg">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                    Accueil
+                </a>
+                <a href="#" class="flex items-center gap-2 text-sm text-clinique-ardoise hover:text-clinique-encre px-3 py-1.5 rounded-lg">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                    Tickets
+                </a>
+                <a href="{% url 'rechercher_patient' %}" class="flex items-center gap-2 text-sm text-clinique-ardoise hover:text-clinique-encre px-3 py-1.5 rounded-lg">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                    Patients
+                </a>
             </div>
         </div>
-        <form method="post" action="{% url 'logout' %}">
-            {% csrf_token %}
-            <button type="submit" class="text-sm text-clinique-ardoise hover:text-clinique-rouge">Déconnexion</button>
-        </form>
+        <div class="flex items-center gap-3">
+            <span class="text-sm text-clinique-ardoise">{{ request.tenant.nom_clinique|default:"Clinique" }}</span>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="w-8 h-8 rounded-full bg-clinique-bleu text-white text-xs font-medium flex items-center justify-center" title="Déconnexion">
+                    {{ request.user.first_name|slice:":1"|default:request.user.username|slice:":1"|upper }}
+                </button>
+            </form>
+        </div>
     </div>
+</nav>
+
+<div class="max-w-6xl mx-auto px-4 py-6 min-h-[calc(100vh-56px)] flex flex-col{% if not session %} items-center justify-center{% endif %}">
+    <h1 class="font-display font-semibold text-xl text-clinique-encre mb-4{% if not session %} text-center{% else %} w-full{% endif %}">Bonjour, {{ request.user.first_name|default:request.user.username }}</h1>
+
     {% if session %}
-        <div class="bg-white rounded-2xl shadow-sm p-4 mb-4">
-            <div class="text-sm text-clinique-ardoise">Session ouverte depuis {{ session.date_ouverture|time:"H:i" }}</div>
-            <div class="flex gap-6 mt-2">
-                <div>
-                    <div class="text-2xl font-display font-semibold text-clinique-bleu tabular">{{ tickets|length }}</div>
-                    <div class="text-xs text-clinique-ardoise">Tickets</div>
+    <div class="flex flex-col lg:flex-row gap-6">
+        <div class="lg:w-72 flex-shrink-0 space-y-3">
+            <div class="bg-clinique-bleu rounded-2xl shadow-sm p-5 text-white">
+                <div class="flex items-center gap-2 text-xs text-blue-100">
+                    <span class="w-2 h-2 bg-clinique-vert rounded-full"></span>
+                    Session en cours · ouverte {{ session.date_ouverture|time:"H:i" }}
                 </div>
-                <div>
-                    <div class="text-2xl font-display font-semibold text-clinique-vert tabular">{{ session.total }} FCFA</div>
-                    <div class="text-xs text-clinique-ardoise">Total</div>
-                </div>
+                <div class="text-2xl font-display font-semibold tabular mt-2">{{ session.total }} FCFA</div>
+                <form method="post" action="{% url 'cloturer_session' %}" onsubmit="return confirm('Confirmer la clôture de la session ? Cette action est définitive.');" class="mt-3">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full bg-blue-700 bg-opacity-50 border border-blue-300 text-white rounded-lg py-2 text-sm font-medium hover:bg-opacity-70 transition">
+                        Clôturer la session
+                    </button>
+                </form>
             </div>
-        </div>
-        <div class="grid grid-cols-2 gap-3 mb-4">
-            <a href="{% url 'rechercher_patient' %}" class="bg-clinique-bleu text-white rounded-xl py-4 font-medium text-sm shadow-sm hover:bg-blue-700 transition text-center">
+            <a href="{% url 'rechercher_patient' %}" class="block bg-clinique-bleu text-white rounded-xl py-3 font-medium text-sm shadow-sm hover:bg-blue-700 transition text-center">
                 + Nouveau ticket
             </a>
-            <a href="{% url 'rechercher_patient' %}" class="bg-white border border-gray-200 text-clinique-ardoise rounded-xl py-4 font-medium text-sm shadow-sm hover:bg-gray-50 transition text-center">
-                🔍 Rechercher patient
+            <a href="{% url 'rechercher_patient' %}" class="block bg-white border border-gray-200 text-clinique-ardoise rounded-xl py-3 font-medium text-sm shadow-sm hover:bg-gray-50 transition text-center">
+                Rechercher patient
             </a>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm p-4 mb-4">
+
+        <div class="flex-1">
             <div class="text-sm font-medium text-clinique-ardoise mb-3">Dernières transactions</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             {% for ticket in tickets %}
-            <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                <div>
-                    <div class="text-sm font-medium">{{ ticket.numero }}</div>
-                    <div class="text-xs text-clinique-ardoise">{{ ticket.service.nom }}</div>
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden flex">
+                <div class="flex-1 p-4">
+                    <div class="font-display font-semibold text-clinique-encre">{{ ticket.patient.prenom }} {{ ticket.patient.nom }}</div>
+                    <div class="text-xs text-clinique-ardoise mt-1">{{ ticket.service.nom }} · {{ ticket.date|time:"H:i" }} · {{ ticket.numero }}</div>
                 </div>
-                <div class="text-right">
-                    <div class="text-sm font-medium tabular">{{ ticket.montant }} FCFA</div>
-                    <div class="text-xs {% if ticket.statut_file == 'annule' %}text-gray-400{% elif ticket.statut_paiement == 'paye' %}text-clinique-vert{% else %}text-orange-500{% endif %}">
-                        {% if ticket.statut_file == 'annule' %}Annulé{% else %}{{ ticket.get_statut_paiement_display }}{% endif %}
-                    </div>
+                <div class="relative w-28 bg-clinique-gris flex flex-col items-center justify-center border-l-2 border-dashed border-gray-300">
+                    <div class="absolute -top-2 -left-2 w-4 h-4 bg-clinique-gris rounded-full"></div>
+                    <div class="absolute -bottom-2 -left-2 w-4 h-4 bg-clinique-gris rounded-full"></div>
+                    <div class="font-display font-semibold text-clinique-encre tabular">{{ ticket.montant }}</div>
+                    {% if ticket.statut_file == 'annule' %}
+                    <div class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full mt-1">Annulé</div>
+                    {% elif ticket.statut_paiement == 'paye' %}
+                    <div class="text-xs text-green-800 bg-green-100 px-2 py-0.5 rounded-full mt-1">Payé</div>
+                    {% else %}
+                    <div class="text-xs text-orange-800 bg-orange-100 px-2 py-0.5 rounded-full mt-1">{{ ticket.get_statut_paiement_display }}</div>
+                    {% endif %}
                     {% if ticket.statut_file != 'annule' %}
-                    <a href="{% url 'annuler_ticket' ticket.id %}" class="text-xs text-clinique-rouge hover:underline">Annuler</a>
+                    <a href="{% url 'annuler_ticket' ticket.id %}" class="text-xs text-clinique-rouge hover:underline mt-1">Annuler</a>
                     {% endif %}
                 </div>
             </div>
             {% empty %}
-            <div class="text-sm text-gray-400 text-center py-4">Aucun ticket pour l'instant</div>
+            <div class="bg-white rounded-2xl shadow-sm text-sm text-gray-400 text-center py-6 md:col-span-2">Aucun ticket pour l'instant</div>
             {% endfor %}
+            </div>
         </div>
-        <form method="post" action="{% url 'cloturer_session' %}" onsubmit="return confirm('Confirmer la clôture de la session ? Cette action est définitive.');">
-            {% csrf_token %}
-            <button type="submit" class="w-full bg-clinique-rouge bg-opacity-10 text-clinique-rouge border border-clinique-rouge rounded-xl py-3 font-medium text-sm">
-                Clôturer la session
-            </button>
-        </form>
+    </div>
     {% else %}
-        <div class="bg-white rounded-2xl shadow-sm p-8 text-center">
+        <div class="bg-white rounded-2xl shadow-sm p-8 text-center max-w-md w-full">
             <p class="text-clinique-ardoise mb-4">Aucune session de caisse ouverte.</p>
             <form method="post" action="{% url 'ouvrir_session' %}">
                 {% csrf_token %}
