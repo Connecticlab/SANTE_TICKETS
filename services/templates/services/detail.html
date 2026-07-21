@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{{ service.nom }} — SanteTicket{% endblock %}
+{% block content %}
+{% include 'partials/nav.html' %}
+<div class="max-w-2xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-4">
+        <div>
+            <h1 class="font-display font-semibold text-xl text-clinique-encre">{{ service.nom }}</h1>
+            <div class="text-xs text-clinique-ardoise">{{ service.code }}</div>
+        </div>
+        <a href="{% url 'liste_services' %}" class="text-sm text-clinique-ardoise hover:text-clinique-encre">← Retour</a>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm p-4 mb-4">
+        <div class="text-sm font-medium text-clinique-ardoise mb-3">Tarifs par catégorie de patient</div>
+        {% for tarif in tarifs %}
+        <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+            <div>
+                <span class="font-medium text-clinique-encre">{{ tarif.get_categorie_patient_display }}</span>
+                <span class="text-xs text-clinique-ardoise"> · depuis le {{ tarif.date_effet|date:"d/m/Y" }}</span>
+            </div>
+            <span class="font-display font-semibold text-clinique-encre tabular">
+                {% if tarif.gratuit %}Gratuit{% else %}{{ tarif.montant }} FCFA{% endif %}
+            </span>
+        </div>
+        {% empty %}
+        <div class="text-sm text-gray-400 text-center py-4">Aucun tarif défini pour ce service.</div>
+        {% endfor %}
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm p-4">
+        <div class="text-sm font-medium text-clinique-ardoise mb-3">Ajouter un tarif</div>
+        {% if erreur %}
+        <div class="bg-red-50 border border-clinique-rouge text-clinique-rouge text-sm rounded-lg p-3 mb-3">
+            {{ erreur }}
+        </div>
+        {% endif %}
+        <form method="post" class="space-y-3">
+            {% csrf_token %}
+            <div>
+                <label class="block text-xs font-medium text-clinique-ardoise mb-1">Catégorie de patient</label>
+                {{ form.categorie_patient }}
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-clinique-ardoise mb-1">Montant (FCFA)</label>
+                {{ form.montant }}
+            </div>
+            <div class="flex items-center gap-2">
+                {{ form.gratuit }}
+                <label class="text-sm text-clinique-ardoise">Gratuit (indigent)</label>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-clinique-ardoise mb-1">Date d'effet</label>
+                {{ form.date_effet }}
+            </div>
+            <button type="submit" class="w-full bg-clinique-bleu text-white rounded-lg py-3 font-medium">
+                Ajouter le tarif
+            </button>
+        </form>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const montantInput = document.querySelector('input[name="montant"]');
+    const gratuitCheckbox = document.querySelector('input[name="gratuit"]');
+    if (montantInput && gratuitCheckbox) {
+        montantInput.addEventListener('input', function() {
+            if (montantInput.value && parseFloat(montantInput.value) > 0) {
+                gratuitCheckbox.checked = false;
+            }
+        });
+        gratuitCheckbox.addEventListener('change', function() {
+            if (gratuitCheckbox.checked) {
+                montantInput.value = '0';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
