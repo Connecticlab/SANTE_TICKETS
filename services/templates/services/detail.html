@@ -19,9 +19,12 @@
                 <span class="font-medium text-clinique-encre">{{ tarif.get_categorie_patient_display }}</span>
                 <span class="text-xs text-clinique-ardoise"> · depuis le {{ tarif.date_effet|date:"d/m/Y" }}</span>
             </div>
-            <span class="font-display font-semibold text-clinique-encre tabular">
-                {% if tarif.gratuit %}Gratuit{% else %}{{ tarif.montant }} FCFA{% endif %}
-            </span>
+            <div class="flex items-center gap-3">
+                <span class="font-display font-semibold text-clinique-encre tabular">
+                    {% if tarif.gratuit %}Gratuit{% else %}{{ tarif.montant }} FCFA{% endif %}
+                </span>
+                <a href="{% url 'modifier_tarif' tarif.id %}" class="text-xs text-clinique-bleu hover:underline">Modifier</a>
+            </div>
         </div>
         {% empty %}
         <div class="text-sm text-gray-400 text-center py-4">Aucun tarif défini pour ce service.</div>
@@ -58,6 +61,10 @@
             </button>
         </form>
     </div>
+
+    <a href="{% url 'supprimer_service' service.id %}" class="flex items-center justify-center gap-2 w-full bg-white border border-clinique-rouge text-clinique-rouge rounded-lg py-3 font-medium text-sm hover:bg-red-50 transition mt-4">
+        Supprimer ce service
+    </a>
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {

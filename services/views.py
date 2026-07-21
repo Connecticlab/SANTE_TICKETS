@@ -48,3 +48,38 @@ def detail_service(request, service_id):
         'form': form,
         'erreur': erreur,
     })
+
+
+from django.contrib import messages as django_messages
+from django.db.models import ProtectedError
+
+
+@admin_clinique_required
+def supprimer_service(request, service_id):
+    service = get_object_or_404(ServiceMedical, id=service_id)
+
+    if request.method == 'POST':
+        try:
+            service.delete()
+            django_messages.success(request, "Service supprimé.")
+            return redirect('liste_services')
+        except ProtectedError:
+            django_messages.error(request, "Ce service a des tickets associés et ne peut pas être supprimé. Désactivez-le plutôt.")
+            return redirect('detail_service', service_id=service.id)
+
+    return render(request, 'services/confirmer_suppression.html', {'service': service})
+
+
+@admin_clinique_required
+def modifier_tarif(request, tarif_id):
+    tarif = get_object_or_404(TarifService, id=tarif_id)
+
+    if request.method == 'POST':
+        form = TarifServiceForm(request.POST, instance=tarif)
+        if form.is_valid():
+            form.save()
+            return redirect('detail_service', service_id=tarif.service.id)
+    else:
+        form = TarifServiceForm(instance=tarif)
+
+    return render(request, 'services/modifier_tarif.html', {'form': form, 'tarif': tarif})
