@@ -281,3 +281,26 @@ def liste_tickets(request):
         'statut_filtre': statut,
         'recherche': recherche or '',
     })
+
+
+from comptes.decorators import admin_clinique_required
+
+
+@admin_clinique_required
+def vue_sessions(request):
+    sessions_ouvertes = CaisseSession.objects.filter(statut='ouverte').order_by('-date_ouverture')
+    sessions_cloturees = CaisseSession.objects.filter(statut='cloturee').order_by('-date_cloture')[:10]
+    return render(request, 'caisse/vue_sessions.html', {
+        'sessions_ouvertes': sessions_ouvertes,
+        'sessions_cloturees': sessions_cloturees,
+    })
+
+
+@admin_clinique_required
+def detail_session(request, session_id):
+    session = get_object_or_404(CaisseSession, id=session_id)
+    tickets = session.tickets.order_by('-date')
+    return render(request, 'caisse/detail_session.html', {
+        'session': session,
+        'tickets': tickets,
+    })

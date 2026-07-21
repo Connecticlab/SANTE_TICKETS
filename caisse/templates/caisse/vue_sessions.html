@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Sessions de caisse — SanteTicket{% endblock %}
+{% block content %}
+{% include 'partials/nav.html' %}
+<div class="max-w-3xl mx-auto px-4 py-6">
+    <h1 class="font-display font-semibold text-xl text-clinique-encre mb-4">Sessions de caisse</h1>
+
+    <div class="text-sm font-medium text-clinique-ardoise mb-3">Sessions ouvertes ({{ sessions_ouvertes|length }})</div>
+    <div class="space-y-2 mb-6">
+    {% for session in sessions_ouvertes %}
+        <a href="{% url 'detail_session' session.id %}" class="bg-white rounded-2xl shadow-sm p-4 flex items-center justify-between hover:shadow-md transition">
+            <div class="flex items-center gap-3">
+                <span class="w-2 h-2 bg-clinique-vert rounded-full"></span>
+                <div>
+                    <div class="font-medium text-clinique-encre">{{ session.caissier.first_name }} {{ session.caissier.last_name }}</div>
+                    <div class="text-xs text-clinique-ardoise">Ouverte à {{ session.date_ouverture|time:"H:i" }} le {{ session.date_ouverture|date:"d/m/Y" }}</div>
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="font-display font-semibold text-clinique-bleu tabular">{{ session.total }} FCFA</div>
+                <div class="text-xs text-clinique-ardoise">{{ session.tickets.count }} ticket(s)</div>
+            </div>
+        </a>
+    {% empty %}
+        <div class="bg-white rounded-2xl shadow-sm text-sm text-gray-400 text-center py-6">Aucune session ouverte actuellement.</div>
+    {% endfor %}
+    </div>
+
+    <div class="text-sm font-medium text-clinique-ardoise mb-3">Dernières sessions clôturées</div>
+    <div class="space-y-2">
+    {% for session in sessions_cloturees %}
+        <div class="bg-white rounded-2xl shadow-sm p-4 flex items-center justify-between opacity-75">
+            <div>
+                <div class="font-medium text-clinique-encre">{{ session.caissier.first_name }} {{ session.caissier.last_name }}</div>
+                <div class="text-xs text-clinique-ardoise">Clôturée le {{ session.date_cloture|date:"d/m/Y H:i" }}</div>
+            </div>
+            <div class="text-right">
+                <div class="font-display font-semibold text-clinique-encre tabular">{{ session.total }} FCFA</div>
+                <div class="text-xs text-clinique-ardoise">{{ session.tickets.count }} ticket(s)</div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="bg-white rounded-2xl shadow-sm text-sm text-gray-400 text-center py-6">Aucune session clôturée.</div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}

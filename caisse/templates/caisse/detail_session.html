@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Session — {{ session.caissier.first_name }} {{ session.caissier.last_name }}{% endblock %}
+{% block content %}
+<meta http-equiv="refresh" content="15">
+{% include 'partials/nav.html' %}
+<div class="max-w-3xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-4">
+        <div>
+            <h1 class="font-display font-semibold text-xl text-clinique-encre">{{ session.caissier.first_name }} {{ session.caissier.last_name }}</h1>
+            <div class="text-xs text-clinique-ardoise">
+                {% if session.statut == 'ouverte' %}
+                <span class="inline-flex items-center gap-1"><span class="w-2 h-2 bg-clinique-vert rounded-full"></span> Session en cours</span>
+                {% else %}
+                Session clôturée le {{ session.date_cloture|date:"d/m/Y H:i" }}
+                {% endif %}
+            </div>
+        </div>
+        <a href="{% url 'vue_sessions' %}" class="text-sm text-clinique-ardoise hover:text-clinique-encre">← Retour</a>
+    </div>
+
+    <div class="bg-clinique-bleu rounded-2xl shadow-sm p-5 mb-4 text-white">
+        <div class="text-xs text-blue-100">Total de la session (lecture seule)</div>
+        <div class="text-3xl font-display font-semibold tabular mt-2">{{ session.total }} FCFA</div>
+    </div>
+
+    <div class="text-sm font-medium text-clinique-ardoise mb-3">Tickets de cette session ({{ tickets|length }})</div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+    {% for ticket in tickets %}
+        <div class="bg-white rounded-2xl shadow-sm overflow-hidden flex">
+            <div class="flex-1 p-4">
+                <div class="font-display font-semibold text-clinique-encre">{{ ticket.patient.prenom }} {{ ticket.patient.nom }}</div>
+                <div class="text-xs text-clinique-ardoise mt-1">{{ ticket.service.nom }} · {{ ticket.date|time:"H:i" }} · {{ ticket.numero }}</div>
+            </div>
+            <div class="relative w-24 bg-clinique-gris flex flex-col items-center justify-center border-l-2 border-dashed border-gray-300">
+                <div class="font-display font-semibold text-clinique-encre tabular text-sm">{{ ticket.montant }}</div>
+                {% if ticket.statut_file == 'annule' %}
+                <div class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full mt-1">Annulé</div>
+                {% elif ticket.statut_paiement == 'paye' %}
+                <div class="text-xs text-green-800 bg-green-100 px-2 py-0.5 rounded-full mt-1">Payé</div>
+                {% else %}
+                <div class="text-xs text-orange-800 bg-orange-100 px-2 py-0.5 rounded-full mt-1">{{ ticket.get_statut_paiement_display }}</div>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <div class="bg-white rounded-2xl shadow-sm text-sm text-gray-400 text-center py-6 md:col-span-2">Aucun ticket dans cette session.</div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}
