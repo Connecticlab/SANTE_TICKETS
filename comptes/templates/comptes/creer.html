@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Nouveau compte — SanteTicket{% endblock %}
+{% block content %}
+{% include 'partials/nav.html' %}
+<div class="max-w-2xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-4">
+        <h1 class="font-display font-semibold text-xl text-clinique-encre">Nouveau compte utilisateur</h1>
+        <a href="{% url 'liste_comptes' %}" class="text-sm text-clinique-ardoise hover:text-clinique-encre">← Retour</a>
+    </div>
+
+    <form method="post" class="bg-white rounded-2xl shadow-sm p-4 space-y-3">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="bg-red-50 border border-clinique-rouge text-clinique-rouge text-sm rounded-lg p-3">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-medium text-clinique-ardoise mb-1">Nom</label>
+                {{ form.nom }}
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-clinique-ardoise mb-1">Prénom</label>
+                {{ form.prenom }}
+            </div>
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-clinique-ardoise mb-1">Nom d'utilisateur</label>
+            {{ form.username }}
+            {% if form.username.errors %}<p class="text-xs text-clinique-rouge mt-1">{{ form.username.errors|join:", " }}</p>{% endif %}
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-clinique-ardoise mb-1">Téléphone</label>
+            {{ form.telephone }}
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-clinique-ardoise mb-1">Rôle</label>
+            {{ form.role }}
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-clinique-ardoise mb-1">Mot de passe</label>
+            {{ form.password }}
+        </div>
+        <button type="submit" class="w-full bg-clinique-bleu text-white rounded-lg py-3 font-medium">
+            Créer le compte
+        </button>
+    </form>
+</div>
+{% endblock %}
