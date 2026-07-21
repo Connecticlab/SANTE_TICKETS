@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{% if categorie %}Modifier{% else %}Nouvelle{% endif %} catégorie — SanteTicket{% endblock %}
+{% block content %}
+{% include 'partials/nav.html' %}
+<div class="max-w-2xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-4">
+        <h1 class="font-display font-semibold text-xl text-clinique-encre">{% if categorie %}Modifier{% else %}Nouvelle{% endif %} catégorie</h1>
+        <a href="{% url 'liste_categories' %}" class="text-sm text-clinique-ardoise hover:text-clinique-encre">← Retour</a>
+    </div>
+
+    <form method="post" class="bg-white rounded-2xl shadow-sm p-4 space-y-3">
+        {% csrf_token %}
+        <div>
+            <label class="block text-xs font-medium text-clinique-ardoise mb-1">Code technique (sans espace, ex: ordinaire)</label>
+            {{ form.code }}
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-clinique-ardoise mb-1">Libellé affiché</label>
+            {{ form.libelle }}
+        </div>
+        <div class="flex items-center gap-2">
+            {{ form.actif }}
+            <label class="text-sm text-clinique-ardoise">Catégorie active</label>
+        </div>
+        <button type="submit" class="w-full bg-clinique-bleu text-white rounded-lg py-3 font-medium">
+            {% if categorie %}Enregistrer les modifications{% else %}Créer la catégorie{% endif %}
+        </button>
+    </form>
+</div>
+{% endblock %}

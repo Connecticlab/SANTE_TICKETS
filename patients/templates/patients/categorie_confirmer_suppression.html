@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Supprimer {{ categorie.libelle }} — SanteTicket{% endblock %}
+{% block content %}
+{% include 'partials/nav.html' %}
+<div class="max-w-md mx-auto px-4 py-8">
+    <div class="bg-white rounded-2xl shadow-sm p-6">
+        <h1 class="font-display font-semibold text-xl text-clinique-rouge mb-4">Supprimer cette catégorie ?</h1>
+
+        <div class="bg-clinique-gris rounded-lg p-3 mb-4">
+            <div class="font-medium text-clinique-encre">{{ categorie.libelle }}</div>
+            <div class="text-xs text-clinique-ardoise">Code : {{ categorie.code }}</div>
+        </div>
+
+        <p class="text-sm text-clinique-ardoise mb-4">Cette action est irréversible. La catégorie ne pourra être supprimée que si aucun patient ne l'utilise.</p>
+
+        <form method="post" class="space-y-2">
+            {% csrf_token %}
+            <button type="submit" class="w-full bg-clinique-rouge text-white rounded-lg py-3 font-medium">
+                Confirmer la suppression
+            </button>
+        </form>
+        <a href="{% url 'liste_categories' %}" class="block text-center text-sm text-clinique-ardoise hover:underline mt-3">
+            Annuler
+        </a>
+    </div>
+</div>
+{% endblock %}

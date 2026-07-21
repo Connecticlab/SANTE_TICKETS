@@ -24,3 +24,13 @@ class CreationPatientForm(forms.ModelForm):
             'categorie': forms.Select(attrs={'class': INPUT_CLASS}),
             'quartier_village': forms.Select(attrs={'class': INPUT_CLASS}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from .models import CategoriePatient
+        choix_categories = [(c.code, c.libelle) for c in CategoriePatient.objects.filter(actif=True)]
+        if choix_categories:
+            self.fields['categorie'].widget = forms.Select(
+                choices=choix_categories,
+                attrs={'class': INPUT_CLASS},
+            )

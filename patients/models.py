@@ -3,6 +3,20 @@ from django.db import models
 from localites.models import Localite
 
 
+class CategoriePatient(models.Model):
+    code = models.CharField(max_length=30, unique=True, help_text="Identifiant technique (ex: ordinaire)")
+    libelle = models.CharField(max_length=100, help_text="Nom affiche (ex: Ordinaire)")
+    actif = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "Categorie de patient"
+        verbose_name_plural = "Categories de patient"
+        ordering = ['libelle']
+
+    def __str__(self):
+        return self.libelle
+
+
 class Patient(models.Model):
     CATEGORIE_CHOICES = [
         ('ordinaire', 'Ordinaire'),
@@ -30,6 +44,10 @@ class Patient(models.Model):
         verbose_name = "Patient"
         verbose_name_plural = "Patients"
         ordering = ['-date_creation']
+
+    def get_categorie_libelle(self):
+        categorie = CategoriePatient.objects.filter(code=self.categorie).first()
+        return categorie.libelle if categorie else self.get_categorie_display()
 
     def save(self, *args, **kwargs):
         if not self.numero_patient:

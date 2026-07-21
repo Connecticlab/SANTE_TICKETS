@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Quartiers/Villages — SanteTicket{% endblock %}
+{% block content %}
+{% include 'partials/nav.html' %}
+<div class="max-w-2xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-4">
+        <h1 class="font-display font-semibold text-xl text-clinique-encre">Quartiers / Villages</h1>
+        <a href="{% url 'creer_localite' %}" class="bg-clinique-bleu text-white rounded-lg px-4 py-2 text-sm font-medium">+ Nouvelle localité</a>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm p-2">
+    {% for localite in localites %}
+        <div class="flex items-center justify-between p-3 {% if not forloop.last %}border-b border-gray-100{% endif %}">
+            <div>
+                <div class="font-medium text-clinique-encre">{{ localite.nom }}</div>
+                <div class="text-xs text-clinique-ardoise">{% if localite.commune %}Commune : {{ localite.commune.nom }}{% else %}Sans commune{% endif %}</div>
+            </div>
+            <div class="flex items-center gap-3">
+                {% if localite.actif %}
+                <span class="text-xs text-green-800 bg-green-100 px-2.5 py-1 rounded-full font-medium">Actif</span>
+                {% else %}
+                <span class="text-xs text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full font-medium">Inactif</span>
+                {% endif %}
+                <a href="{% url 'modifier_localite' localite.id %}" class="text-xs font-medium text-clinique-bleu bg-blue-50 px-2.5 py-1 rounded-full hover:bg-blue-100 transition">Modifier</a>
+                <a href="{% url 'supprimer_localite' localite.id %}" class="text-xs font-medium text-clinique-rouge bg-red-50 px-2.5 py-1 rounded-full hover:bg-red-100 transition">Supprimer</a>
+            </div>
+        </div>
+    {% empty %}
+        <div class="text-sm text-gray-400 text-center py-8">Aucune localité enregistrée.</div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}

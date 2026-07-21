@@ -13,6 +13,7 @@
         <div class="font-display font-semibold text-clinique-encre">{{ request.tenant.nom_clinique|default:"Clinique" }}</div>
         <div class="font-display font-bold text-3xl text-clinique-bleu tabular mt-1">{{ ticket.numero }}</div>
         <div class="text-sm text-clinique-ardoise mt-1">{{ ticket.patient.prenom }} {{ ticket.patient.nom }} · {{ ticket.service.nom }}</div>
+        <div class="text-xs text-gray-400 mt-1">Caissier : {{ ticket.session.caissier.first_name }} {{ ticket.session.caissier.last_name }}</div>
 
         <div class="flex justify-center my-5">
             <img src="{% url 'qr_code_ticket' ticket.id %}" alt="QR code du ticket" class="w-40 h-40 border border-gray-100 rounded-lg p-2">

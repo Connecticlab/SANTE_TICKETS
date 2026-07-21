@@ -24,3 +24,13 @@ class TarifServiceForm(forms.ModelForm):
             'montant': forms.NumberInput(attrs={'class': INPUT_CLASS}),
             'date_effet': forms.DateInput(attrs={'type': 'date', 'class': INPUT_CLASS}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from patients.models import CategoriePatient
+        choix_categories = [(c.code, c.libelle) for c in CategoriePatient.objects.filter(actif=True)]
+        if choix_categories:
+            self.fields['categorie_patient'].widget = forms.Select(
+                choices=choix_categories,
+                attrs={'class': INPUT_CLASS},
+            )

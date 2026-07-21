@@ -36,6 +36,11 @@ class TarifService(models.Model):
             )
         ]
 
+    def get_categorie_libelle(self):
+        from patients.models import CategoriePatient
+        categorie = CategoriePatient.objects.filter(code=self.categorie_patient).first()
+        return categorie.libelle if categorie else self.get_categorie_patient_display()
+
     def __str__(self):
         if self.gratuit:
             return f"{self.service.nom} — {self.categorie_patient} — Gratuit"

@@ -16,7 +16,7 @@
         {% for tarif in tarifs %}
         <div class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
             <div>
-                <span class="font-medium text-clinique-encre">{{ tarif.get_categorie_patient_display }}</span>
+                <span class="font-medium text-clinique-encre">{{ tarif.get_categorie_libelle }}</span>
                 <span class="text-xs text-clinique-ardoise"> · depuis le {{ tarif.date_effet|date:"d/m/Y" }}</span>
             </div>
             <div class="flex items-center gap-3">

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .forms import RecherchePatientForm, CreationPatientForm
 from .services import rechercher_patient
@@ -155,3 +155,83 @@ def supprimer_patient_view(request, patient_id):
             erreur = "Ce patient a des tickets associes et ne peut pas etre supprime. L'historique doit etre conserve."
 
     return render(request, 'patients/confirmer_suppression.html', {'patient': patient, 'erreur': erreur})
+
+
+from comptes.decorators import admin_clinique_required
+from django.contrib import messages as django_messages
+from django.db.models import ProtectedError
+
+
+@admin_clinique_required
+def liste_categories(request):
+    from .models import CategoriePatient
+    categories = CategoriePatient.objects.all().order_by('libelle')
+    return render(request, 'patients/categories_liste.html', {'categories': categories})
+
+
+@admin_clinique_required
+def creer_categorie(request):
+    from .models import CategoriePatient
+    from django import forms as django_forms
+
+    class CategorieForm(django_forms.ModelForm):
+        class Meta:
+            model = CategoriePatient
+            fields = ['code', 'libelle', 'actif']
+            widgets = {
+                'code': django_forms.TextInput(attrs={'class': 'w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-clinique-bleu'}),
+                'libelle': django_forms.TextInput(attrs={'class': 'w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-clinique-bleu'}),
+            }
+
+    if request.method == 'POST':
+        form = CategorieForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('liste_categories')
+    else:
+        form = CategorieForm()
+
+    return render(request, 'patients/categorie_form.html', {'form': form})
+
+
+@admin_clinique_required
+def modifier_categorie(request, categorie_id):
+    from .models import CategoriePatient
+    from django import forms as django_forms
+
+    categorie = get_object_or_404(CategoriePatient, id=categorie_id)
+
+    class CategorieForm(django_forms.ModelForm):
+        class Meta:
+            model = CategoriePatient
+            fields = ['code', 'libelle', 'actif']
+            widgets = {
+                'code': django_forms.TextInput(attrs={'class': 'w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-clinique-bleu'}),
+                'libelle': django_forms.TextInput(attrs={'class': 'w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-clinique-bleu'}),
+            }
+
+    if request.method == 'POST':
+        form = CategorieForm(request.POST, instance=categorie)
+        if form.is_valid():
+            form.save()
+            return redirect('liste_categories')
+    else:
+        form = CategorieForm(instance=categorie)
+
+    return render(request, 'patients/categorie_form.html', {'form': form, 'categorie': categorie})
+
+
+@admin_clinique_required
+def supprimer_categorie(request, categorie_id):
+    from .models import CategoriePatient, Patient
+    categorie = get_object_or_404(CategoriePatient, id=categorie_id)
+
+    if request.method == 'POST':
+        if Patient.objects.filter(categorie=categorie.code).exists():
+            django_messages.error(request, "Cette catégorie est utilisée par des patients et ne peut pas être supprimée.")
+            return redirect('liste_categories')
+        categorie.delete()
+        django_messages.success(request, "Catégorie supprimée.")
+        return redirect('liste_categories')
+
+    return render(request, 'patients/categorie_confirmer_suppression.html', {'categorie': categorie})
