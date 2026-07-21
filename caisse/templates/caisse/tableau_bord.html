@@ -65,6 +65,12 @@
             <div class="bg-white rounded-2xl shadow-sm text-sm text-gray-400 text-center py-6 md:col-span-2">Aucun ticket pour l'instant</div>
             {% endfor %}
             </div>
+            <div class="mt-3">
+                <a href="{% url 'liste_tickets' %}" class="flex items-center justify-center gap-2 bg-clinique-bleu text-white rounded-xl py-3 font-medium text-sm shadow-sm hover:bg-blue-700 transition">
+                    Voir tous les tickets
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                </a>
+            </div>
         </div>
     </div>
     {% else %}
