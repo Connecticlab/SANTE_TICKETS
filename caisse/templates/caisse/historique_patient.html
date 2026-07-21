@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Historique — {{ patient.prenom }} {{ patient.nom }}{% endblock %}
+{% block content %}
+{% include 'partials/nav.html' %}
+<div class="max-w-2xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-4">
+        <div>
+            <h1 class="font-display font-semibold text-xl text-clinique-encre">{{ patient.prenom }} {{ patient.nom }}</h1>
+            <div class="text-sm text-clinique-ardoise">{{ patient.numero_patient }} · {{ patient.telephone|default:"Sans téléphone" }}</div>
+        </div>
+        <a href="{% url 'rechercher_patient' %}" class="text-sm text-clinique-ardoise hover:text-clinique-encre">← Retour</a>
+    </div>
+
+    <div class="text-sm font-medium text-clinique-ardoise mb-3">Historique des tickets</div>
+    <div class="space-y-2">
+    {% for ticket in tickets %}
+        <div class="bg-white rounded-2xl shadow-sm p-4 flex items-center justify-between">
+            <div>
+                <div class="font-display font-semibold text-clinique-encre tabular">{{ ticket.numero }}</div>
+                <div class="text-xs text-clinique-ardoise">{{ ticket.service.nom }} · {{ ticket.date|date:"d/m/Y H:i" }}</div>
+                <div class="text-xs mt-1 {% if ticket.statut_file == 'annule' %}text-gray-400{% elif ticket.statut_paiement == 'paye' %}text-clinique-vert{% else %}text-orange-500{% endif %}">
+                    {% if ticket.statut_file == 'annule' %}Annulé{% else %}{{ ticket.get_statut_paiement_display }}{% endif %}
+                    · {{ ticket.montant }} FCFA
+                </div>
+            </div>
+            <a href="{% url 'voir_ticket' ticket.id %}" class="text-sm text-clinique-bleu hover:underline flex-shrink-0 ml-4">
+                Réimprimer
+            </a>
+        </div>
+    {% empty %}
+        <div class="bg-white rounded-2xl shadow-sm text-sm text-gray-400 text-center py-8">Aucun ticket dans l'historique de ce patient.</div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}

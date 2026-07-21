@@ -236,4 +236,22 @@ def scanner_ticket(request, qr_token):
 @login_required
 def voir_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id, session__caissier=request.user)
-    return render(request, 'caisse/voir_ticket.html', {'ticket': ticket})
+    lien_scan = request.build_absolute_uri(f'/scan/{ticket.qr_token}/')
+    partage_texte = (
+        f"Ticket {ticket.numero} - {request.tenant.nom_clinique if hasattr(request, 'tenant') else 'Clinique'}\n"
+        f"Patient: {ticket.patient.prenom} {ticket.patient.nom}\n"
+        f"Service: {ticket.service.nom}\n"
+        f"Montant: {ticket.montant} FCFA\n"
+        f"{lien_scan}"
+    )
+    return render(request, 'caisse/voir_ticket.html', {'ticket': ticket, 'partage_texte': partage_texte})
+
+
+@login_required
+def historique_patient(request, patient_id):
+    patient = get_object_or_404(Patient, id=patient_id)
+    tickets = Ticket.objects.filter(patient=patient).order_by('-date')
+    return render(request, 'caisse/historique_patient.html', {
+        'patient': patient,
+        'tickets': tickets,
+    })

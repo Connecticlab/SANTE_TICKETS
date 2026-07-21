@@ -12,4 +12,5 @@ urlpatterns = [
     path('ticket/qr/<int:ticket_id>/', views.qr_code_ticket, name='qr_code_ticket'),
     path('salle-attente/', views.ecran_appel, name='ecran_appel'),
     path('scan/<uuid:qr_token>/', views.scanner_ticket, name='scanner_ticket'),
+    path('historique/<int:patient_id>/', views.historique_patient, name='historique_patient'),
 ]

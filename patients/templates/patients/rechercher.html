@@ -53,6 +53,9 @@
             <div class="flex justify-center pb-3">
                 <img src="{% url 'qr_code_patient' resultat.id %}" alt="Carte QR du patient" class="w-24 h-24 border border-gray-100 rounded-lg p-1">
             </div>
+            <div class="text-center pb-3">
+                <a href="{% url 'historique_patient' resultat.id %}" class="text-sm text-clinique-bleu hover:underline">Voir l'historique des tickets</a>
+            </div>
         </div>
         {% else %}
         <div class="text-center text-sm text-clinique-ardoise mb-4">Aucun patient trouvé pour ces critères.</div>
