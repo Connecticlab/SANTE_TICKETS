@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Ajouter une clinique — SanteTicket{% endblock %}
+{% block content %}
+<nav class="bg-clinique-bleu shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center">
+        <span class="font-display font-semibold text-white">SanteTicket — Console</span>
+    </div>
+</nav>
+{% if messages %}
+<div class="max-w-2xl mx-auto px-4 pt-4 space-y-2">
+    {% for message in messages %}
+    <div class="rounded-lg p-3 text-sm {% if message.tags == 'error' %}bg-red-50 border border-clinique-rouge text-clinique-rouge{% else %}bg-green-50 border border-clinique-vert text-green-800{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+<div class="max-w-2xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-4">
+        <h1 class="font-display font-semibold text-xl text-clinique-encre">Nouvelle clinique</h1>
+        <a href="{% url 'console_super_admin' %}" class="text-sm text-clinique-ardoise hover:text-clinique-encre">← Retour</a>
+    </div>
+
+    <form method="post" class="bg-white rounded-2xl shadow-sm p-4 space-y-3">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="bg-red-50 border border-clinique-rouge text-clinique-rouge text-sm rounded-lg p-3">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="text-sm font-medium text-clinique-ardoise pt-2">Informations de la clinique</div>
+        <div>
+            <label class="block text-xs font-medium text-clinique-ardoise mb-1">Nom de la clinique</label>
+            {{ form.nom_clinique }}
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-clinique-ardoise mb-1">{{ form.schema_name.label }}</label>
+            {{ form.schema_name }}
+            {% if form.schema_name.errors %}<p class="text-xs text-clinique-rouge mt-1">{{ form.schema_name.errors|join:", " }}</p>{% endif %}
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-clinique-ardoise mb-1">{{ form.sous_domaine.label }}</label>
+            {{ form.sous_domaine }}
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-clinique-ardoise mb-1">Formule d'abonnement</label>
+            {{ form.plan_abonnement }}
+        </div>
+
+        <div class="text-sm font-medium text-clinique-ardoise pt-4 border-t border-gray-100">Premier compte Admin Clinique</div>
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-medium text-clinique-ardoise mb-1">Prénom</label>
+                {{ form.admin_prenom }}
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-clinique-ardoise mb-1">Nom</label>
+                {{ form.admin_nom }}
+            </div>
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-clinique-ardoise mb-1">Identifiant de connexion</label>
+            {{ form.admin_username }}
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-clinique-ardoise mb-1">Mot de passe initial</label>
+            {{ form.admin_password }}
+        </div>
+
+        <button type="submit" class="w-full bg-clinique-bleu text-white rounded-lg py-3 font-medium mt-2">
+            Créer la clinique
+        </button>
+    </form>
+</div>
+{% endblock %}
