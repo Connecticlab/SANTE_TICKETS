@@ -236,7 +236,11 @@ def scanner_ticket(request, qr_token):
 
 @login_required
 def voir_ticket(request, ticket_id):
-    ticket = get_object_or_404(Ticket, id=ticket_id, session__caissier=request.user)
+    profile = getattr(request.user, 'profile', None)
+    if profile and profile.est_admin_clinique():
+        ticket = get_object_or_404(Ticket, id=ticket_id)
+    else:
+        ticket = get_object_or_404(Ticket, id=ticket_id, session__caissier=request.user)
     lien_scan = request.build_absolute_uri(f'/scan/{ticket.qr_token}/')
     partage_texte = (
         f"Ticket {ticket.numero} - {request.tenant.nom_clinique if hasattr(request, 'tenant') else 'Clinique'}\n"
@@ -245,7 +249,9 @@ def voir_ticket(request, ticket_id):
         f"Montant: {ticket.montant} FCFA\n"
         f"{lien_scan}"
     )
-    return render(request, 'caisse/voir_ticket.html', {'ticket': ticket, 'partage_texte': partage_texte})
+    profile = getattr(request.user, 'profile', None)
+    peut_modifier = profile and profile.est_admin_clinique()
+    return render(request, 'caisse/voir_ticket.html', {'ticket': ticket, 'partage_texte': partage_texte, 'peut_modifier': peut_modifier})
 
 
 @login_required
@@ -304,3 +310,33 @@ def detail_session(request, session_id):
         'session': session,
         'tickets': tickets,
     })
+
+
+from .forms import ModificationTicketForm
+
+
+@admin_clinique_required
+def modifier_ticket(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+
+    if request.method == 'POST':
+        form = ModificationTicketForm(request.POST, instance=ticket)
+        if form.is_valid():
+            ancien_service = ticket.service.nom
+            ancien_montant = ticket.montant
+            form.save()
+
+            ticket.session.recalculer_total()
+
+            enregistrer_action(
+                utilisateur=request.user,
+                action='modification',
+                modele_cible='Ticket',
+                objet_id=ticket.numero,
+                details=f"Service: {ancien_service} -> {ticket.service.nom}, Montant: {ancien_montant} -> {ticket.montant}",
+            )
+            return redirect('voir_ticket', ticket_id=ticket.id)
+    else:
+        form = ModificationTicketForm(instance=ticket)
+
+    return render(request, 'caisse/modifier_ticket.html', {'form': form, 'ticket': ticket})

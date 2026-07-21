@@ -37,6 +37,11 @@
             <a href="{% url 'tableau_bord' %}" class="block w-full bg-clinique-bleu text-white rounded-lg py-3 font-medium">
                 Retour au tableau de bord
             </a>
+            {% if peut_modifier %}
+            <a href="{% url 'modifier_ticket' ticket.id %}" class="block w-full text-center text-sm text-clinique-bleu hover:underline mt-3">
+                Modifier ce ticket
+            </a>
+            {% endif %}
         </div>
     </div>
 </div>

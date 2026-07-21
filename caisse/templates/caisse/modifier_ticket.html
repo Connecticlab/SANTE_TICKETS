@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Modifier {{ ticket.numero }} — SanteTicket{% endblock %}
+{% block content %}
+{% include 'partials/nav.html' %}
+<div class="max-w-2xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-4">
+        <h1 class="font-display font-semibold text-xl text-clinique-encre">Modifier {{ ticket.numero }}</h1>
+        <a href="{% url 'voir_ticket' ticket.id %}" class="text-sm text-clinique-ardoise hover:text-clinique-encre">← Retour</a>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm p-4 mb-4">
+        <div class="text-sm text-clinique-ardoise">Patient</div>
+        <div class="font-medium text-clinique-encre">{{ ticket.patient.prenom }} {{ ticket.patient.nom }}</div>
+    </div>
+
+    <form method="post" class="bg-white rounded-2xl shadow-sm p-4 space-y-3">
+        {% csrf_token %}
+        <div>
+            <label class="block text-xs font-medium text-clinique-ardoise mb-1">Service médical</label>
+            {{ form.service }}
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-clinique-ardoise mb-1">Montant (FCFA)</label>
+            {{ form.montant }}
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-clinique-ardoise mb-1">Statut de paiement</label>
+            {{ form.statut_paiement }}
+        </div>
+        <button type="submit" class="w-full bg-clinique-bleu text-white rounded-lg py-3 font-medium">
+            Enregistrer les modifications
+        </button>
+    </form>
+</div>
+{% endblock %}
