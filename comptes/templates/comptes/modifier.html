@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Modifier {{ profile.user.username }} — SanteTicket{% endblock %}
+{% block content %}
+{% include 'partials/nav.html' %}
+<div class="max-w-2xl mx-auto px-4 py-6">
+    <div class="flex items-center justify-between mb-4">
+        <h1 class="font-display font-semibold text-xl text-clinique-encre">Modifier {{ profile.user.username }}</h1>
+        <a href="{% url 'liste_comptes' %}" class="text-sm text-clinique-ardoise hover:text-clinique-encre">← Retour</a>
+    </div>
+
+    <form method="post" class="bg-white rounded-2xl shadow-sm p-4 space-y-3">
+        {% csrf_token %}
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-medium text-clinique-ardoise mb-1">Nom</label>
+                {{ form.nom }}
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-clinique-ardoise mb-1">Prénom</label>
+                {{ form.prenom }}
+            </div>
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-clinique-ardoise mb-1">Téléphone</label>
+            {{ form.telephone }}
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-clinique-ardoise mb-1">Rôle</label>
+            {{ form.role }}
+        </div>
+        <div class="pt-2 border-t border-gray-100">
+            <label class="block text-xs font-medium text-clinique-ardoise mb-1">{{ form.nouveau_mot_de_passe.label }}</label>
+            {{ form.nouveau_mot_de_passe }}
+        </div>
+        <button type="submit" class="w-full bg-clinique-bleu text-white rounded-lg py-3 font-medium">
+            Enregistrer les modifications
+        </button>
+    </form>
+
+    <a href="{% url 'supprimer_compte' profile.id %}" class="flex items-center justify-center gap-2 w-full bg-white border border-clinique-rouge text-clinique-rouge rounded-lg py-3 font-medium text-sm hover:bg-red-50 transition mt-3">
+        Supprimer ce compte
+    </a>
+</div>
+{% endblock %}

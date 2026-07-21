@@ -20,18 +20,21 @@
                     <div class="text-xs text-clinique-ardoise">{{ profile.user.username }} · {{ profile.get_role_display }}</div>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
                 {% if profile.actif %}
-                <span class="text-xs text-green-800 bg-green-100 px-2 py-0.5 rounded-full">Actif</span>
+                <span class="text-xs text-green-800 bg-green-100 px-2.5 py-1 rounded-full font-medium">Actif</span>
                 {% else %}
-                <span class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">Désactivé</span>
+                <span class="text-xs text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full font-medium">Désactivé</span>
                 {% endif %}
+                <a href="{% url 'modifier_compte' profile.id %}" class="text-xs font-medium text-clinique-bleu bg-blue-50 px-2.5 py-1 rounded-full hover:bg-blue-100 transition">Modifier</a>
                 {% if profile.user != request.user %}
                 <form method="post" action="{% url 'basculer_actif_compte' profile.id %}">
                     {% csrf_token %}
-                    <button type="submit" class="text-xs text-clinique-bleu hover:underline">
-                        {% if profile.actif %}Désactiver{% else %}Activer{% endif %}
-                    </button>
+                    {% if profile.actif %}
+                    <button type="submit" class="text-xs font-medium text-clinique-rouge bg-red-50 px-2.5 py-1 rounded-full hover:bg-red-100 transition">Désactiver</button>
+                    {% else %}
+                    <button type="submit" class="text-xs font-medium text-clinique-vert bg-green-50 px-2.5 py-1 rounded-full hover:bg-green-100 transition">Activer</button>
+                    {% endif %}
                 </form>
                 {% endif %}
             </div>

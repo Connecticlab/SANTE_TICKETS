@@ -38,3 +38,12 @@
         </div>
     </div>
 </nav>
+{% if messages %}
+<div class="max-w-6xl mx-auto px-4 pt-4 space-y-2">
+    {% for message in messages %}
+    <div class="rounded-lg p-3 text-sm {% if message.tags == 'error' %}bg-red-50 border border-clinique-rouge text-clinique-rouge{% else %}bg-green-50 border border-clinique-vert text-green-800{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
