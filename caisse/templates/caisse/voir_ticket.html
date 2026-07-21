@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Ticket {{ ticket.numero }} — SanteTicket{% endblock %}
+{% block content %}
+{% include 'partials/nav.html' %}
+<div class="max-w-md mx-auto px-4 py-8">
+    <div class="bg-white rounded-2xl shadow-sm p-6 text-center">
+        <div class="inline-flex items-center gap-2 text-clinique-vert bg-green-50 px-3 py-1 rounded-full text-xs font-medium mb-4">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+            Ticket émis
+        </div>
+        <div class="font-display font-bold text-3xl text-clinique-bleu tabular">{{ ticket.numero }}</div>
+        <div class="text-sm text-clinique-ardoise mt-1">{{ ticket.patient.prenom }} {{ ticket.patient.nom }} · {{ ticket.service.nom }}</div>
+
+        <div class="flex justify-center my-5">
+            <img src="{% url 'qr_code_ticket' ticket.id %}" alt="QR code du ticket" class="w-40 h-40 border border-gray-100 rounded-lg p-2">
+        </div>
+
+        <div class="text-2xl font-display font-semibold text-clinique-encre tabular mb-1">{{ ticket.montant }} FCFA</div>
+        <div class="text-xs text-clinique-ardoise mb-6">{{ ticket.get_statut_paiement_display }}</div>
+
+        <a href="{% url 'tableau_bord' %}" class="block w-full bg-clinique-bleu text-white rounded-lg py-3 font-medium">
+            Retour au tableau de bord
+        </a>
+    </div>
+</div>
+{% endblock %}

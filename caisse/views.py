@@ -93,7 +93,7 @@ def nouveau_ticket(request, patient_id):
                     details=f"Service: {service.nom}, Montant: {montant}",
                 )
 
-                return redirect('tableau_bord')
+                return redirect('voir_ticket', ticket_id=ticket.id)
     else:
         form = EmissionTicketForm()
 
@@ -206,3 +206,34 @@ def ecran_appel(request):
         'clinique': getattr(request, 'tenant', None),
     }
     return render(request, 'caisse/ecran_appel.html', context)
+
+
+import qrcode
+from io import BytesIO
+from django.http import HttpResponse
+
+
+@login_required
+def qr_code_ticket(request, ticket_id):
+    from django.urls import reverse
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+    url_scan = request.build_absolute_uri(reverse('scanner_ticket', args=[ticket.qr_token]))
+    img = qrcode.make(url_scan)
+    buffer = BytesIO()
+    img.save(buffer, format='PNG')
+    return HttpResponse(buffer.getvalue(), content_type='image/png')
+
+
+def scanner_ticket(request, qr_token):
+    ticket = get_object_or_404(Ticket, qr_token=qr_token)
+    context = {
+        'ticket': ticket,
+        'utilisateur_connecte': request.user.is_authenticated,
+    }
+    return render(request, 'caisse/scan_ticket.html', context)
+
+
+@login_required
+def voir_ticket(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id, session__caissier=request.user)
+    return render(request, 'caisse/voir_ticket.html', {'ticket': ticket})

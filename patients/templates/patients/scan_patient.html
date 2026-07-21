@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Scan patient — SanteTicket{% endblock %}
+{% block content %}
+<div class="min-h-screen flex items-center justify-center px-4">
+    <div class="bg-white rounded-2xl shadow-lg p-6 w-full max-w-sm text-center">
+        {% if not request.user.is_authenticated %}
+            <p class="text-clinique-ardoise mb-4">Connectez-vous pour utiliser la carte patient scannée.</p>
+            <a href="{% url 'login' %}?next={{ request.get_full_path|urlencode }}" class="block bg-clinique-bleu text-white rounded-lg py-3 font-medium">Se connecter</a>
+        {% else %}
+            <p class="text-clinique-ardoise mb-4">Aucun patient ne correspond à cette carte.</p>
+            <a href="{% url 'rechercher_patient' %}" class="block bg-clinique-bleu text-white rounded-lg py-3 font-medium">Rechercher un patient</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

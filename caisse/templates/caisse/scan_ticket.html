@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Ticket {{ ticket.numero }} — SanteTicket{% endblock %}
+{% block content %}
+<div class="min-h-screen flex items-center justify-center px-4 py-8">
+    <div class="bg-white rounded-2xl shadow-lg p-6 w-full max-w-sm">
+        <div class="text-center mb-4">
+            <div class="text-xs tracking-widest text-clinique-ardoise uppercase">Ticket</div>
+            <div class="font-display font-bold text-4xl text-clinique-bleu tabular mt-1">{{ ticket.numero }}</div>
+        </div>
+
+        <div class="space-y-2 text-sm border-t border-gray-100 pt-4">
+            <div class="flex justify-between">
+                <span class="text-clinique-ardoise">Service</span>
+                <span class="font-medium text-clinique-encre">{{ ticket.service.nom }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-clinique-ardoise">Montant</span>
+                <span class="font-medium text-clinique-encre tabular">{{ ticket.montant }} FCFA</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-clinique-ardoise">Date</span>
+                <span class="font-medium text-clinique-encre">{{ ticket.date|date:"d/m/Y H:i" }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-clinique-ardoise">Statut</span>
+                <span class="font-medium text-clinique-encre">
+                    {% if ticket.statut_file == 'annule' %}Annulé
+                    {% else %}{{ ticket.get_statut_paiement_display }}{% endif %}
+                </span>
+            </div>
+        </div>
+
+        {% if utilisateur_connecte %}
+        <div class="mt-4 pt-4 border-t border-gray-100 bg-blue-50 rounded-lg p-3">
+            <div class="text-xs text-clinique-bleu font-medium mb-2">Informations patient (personnel connecté)</div>
+            <div class="space-y-1.5 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-clinique-ardoise">Nom complet</span>
+                    <span class="font-medium text-clinique-encre">{{ ticket.patient.prenom }} {{ ticket.patient.nom }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-clinique-ardoise">N° patient</span>
+                    <span class="font-medium text-clinique-encre">{{ ticket.patient.numero_patient }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-clinique-ardoise">Téléphone</span>
+                    <span class="font-medium text-clinique-encre">{{ ticket.patient.telephone|default:"Non renseigné" }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-clinique-ardoise">Date de naissance</span>
+                    <span class="font-medium text-clinique-encre">{{ ticket.patient.date_naissance|date:"d/m/Y"|default:"Non renseignée" }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-clinique-ardoise">Catégorie</span>
+                    <span class="font-medium text-clinique-encre">{{ ticket.patient.get_categorie_display }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-clinique-ardoise">Quartier/village</span>
+                    <span class="font-medium text-clinique-encre">{{ ticket.patient.quartier_village|default:"Non renseigné" }}</span>
+                </div>
+            </div>
+            <a href="{% url 'nouveau_ticket' ticket.patient.id %}" class="block text-center bg-clinique-bleu text-white rounded-lg py-2 text-sm font-medium mt-3">
+                Émettre un nouveau ticket pour ce patient
+            </a>
+        </div>
+        {% else %}
+        <div class="mt-4 pt-3 border-t border-gray-100 text-center">
+            <p class="text-xs text-gray-400">Connectez-vous pour voir les informations patient</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
