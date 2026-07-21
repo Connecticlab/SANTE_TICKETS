@@ -73,3 +73,85 @@ def scanner_patient(request):
         if patient and request.user.is_authenticated:
             return _redirect('nouveau_ticket', patient_id=patient.id)
     return render(request, 'patients/scan_patient.html', {'trouve': False, 'qr': qr})
+
+
+@_login_required
+def liste_patients_view(request):
+    from .models import Patient
+    patients = Patient.objects.all().order_by('-date_creation')
+
+    recherche = request.GET.get('q')
+    if recherche:
+        patients = patients.filter(
+            nom__icontains=recherche
+        ) | patients.filter(
+            prenom__icontains=recherche
+        ) | patients.filter(
+            telephone__icontains=recherche
+        )
+
+    patients = patients[:50]
+    return render(request, 'patients/liste.html', {'patients': patients, 'recherche': recherche or ''})
+
+
+@_login_required
+def detail_patient_view(request, patient_id):
+    from .models import Patient
+    from .forms import CreationPatientForm
+    patient = Patient.objects.get(id=patient_id)
+
+    if request.method == 'POST':
+        form = CreationPatientForm(request.POST, instance=patient)
+        if form.is_valid():
+            form.save()
+            from audit.models import enregistrer_action
+            enregistrer_action(
+                utilisateur=request.user,
+                action='modification',
+                modele_cible='Patient',
+                objet_id=patient.numero_patient,
+                details="Informations patient modifiees",
+            )
+            return redirect('liste_patients')
+    else:
+        form = CreationPatientForm(instance=patient)
+
+    profile = getattr(request.user, 'profile', None)
+    peut_supprimer = profile and profile.est_admin_clinique()
+
+    return render(request, 'patients/detail.html', {
+        'patient': patient,
+        'form': form,
+        'peut_supprimer': peut_supprimer,
+    })
+
+
+@_login_required
+def supprimer_patient_view(request, patient_id):
+    from .models import Patient
+    from django.contrib.auth.decorators import login_required
+    patient = Patient.objects.get(id=patient_id)
+
+    profile = getattr(request.user, 'profile', None)
+    if not (profile and profile.est_admin_clinique()):
+        return redirect('detail_patient', patient_id=patient.id)
+
+    erreur = None
+    if request.method == 'POST':
+        from django.db.models import ProtectedError
+        from audit.models import enregistrer_action
+        numero = patient.numero_patient
+        try:
+            patient.delete()
+            enregistrer_action(
+                utilisateur=request.user,
+                action='annulation',
+                modele_cible='Patient',
+                objet_id=numero,
+                details=f"Suppression du patient {patient.prenom} {patient.nom}",
+            )
+            return redirect('liste_patients')
+        except ProtectedError:
+            erreur = "Ce patient a des tickets associes et ne peut pas etre supprime. L'historique doit etre conserve."
+
+    return render(request, 'patients/confirmer_suppression.html', {'patient': patient, 'erreur': erreur})

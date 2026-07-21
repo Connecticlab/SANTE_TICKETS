@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Supprimer {{ patient.prenom }} {{ patient.nom }} — SanteTicket{% endblock %}
+{% block content %}
+{% include 'partials/nav.html' %}
+<div class="max-w-md mx-auto px-4 py-8">
+    <div class="bg-white rounded-2xl shadow-sm p-6">
+        <h1 class="font-display font-semibold text-xl text-clinique-rouge mb-4">Supprimer ce patient ?</h1>
+
+        <div class="bg-clinique-gris rounded-lg p-3 mb-4">
+            <div class="font-medium text-clinique-encre">{{ patient.prenom }} {{ patient.nom }}</div>
+            <div class="text-xs text-clinique-ardoise">{{ patient.numero_patient }} · {{ patient.tickets.count }} ticket(s) associé(s)</div>
+        </div>
+
+        {% if erreur %}
+        <div class="bg-red-50 border border-clinique-rouge text-clinique-rouge text-sm rounded-lg p-3 mb-4">
+            {{ erreur }}
+        </div>
+        {% else %}
+        <p class="text-sm text-clinique-ardoise mb-4">Cette action est irréversible. Le patient ne pourra être supprimé que s'il n'a aucun ticket associé, afin de préserver l'historique médical.</p>
+        {% endif %}
+
+        <form method="post" class="space-y-2">
+            {% csrf_token %}
+            <button type="submit" class="w-full bg-clinique-rouge text-white rounded-lg py-3 font-medium">
+                Confirmer la suppression
+            </button>
+        </form>
+        <a href="{% url 'detail_patient' patient.id %}" class="block text-center text-sm text-clinique-ardoise hover:underline mt-3">
+            Annuler
+        </a>
+    </div>
+</div>
+{% endblock %}

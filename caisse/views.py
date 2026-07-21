@@ -1,3 +1,4 @@
+from django.db import models
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
@@ -254,4 +255,29 @@ def historique_patient(request, patient_id):
     return render(request, 'caisse/historique_patient.html', {
         'patient': patient,
         'tickets': tickets,
+    })
+
+
+@login_required
+def liste_tickets(request):
+    tickets = Ticket.objects.all().order_by('-date')
+
+    statut = request.GET.get('statut')
+    if statut:
+        tickets = tickets.filter(statut_file=statut)
+
+    recherche = request.GET.get('q')
+    if recherche:
+        tickets = tickets.filter(
+            models.Q(numero__icontains=recherche) |
+            models.Q(patient__nom__icontains=recherche) |
+            models.Q(patient__prenom__icontains=recherche)
+        )
+
+    tickets = tickets[:50]
+
+    return render(request, 'caisse/liste_tickets.html', {
+        'tickets': tickets,
+        'statut_filtre': statut,
+        'recherche': recherche or '',
     })

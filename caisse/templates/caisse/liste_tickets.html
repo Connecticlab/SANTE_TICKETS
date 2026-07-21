@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Tickets — SanteTicket{% endblock %}
+{% block content %}
+{% include 'partials/nav.html' %}
+<div class="max-w-4xl mx-auto px-4 py-6">
+    <h1 class="font-display font-semibold text-xl text-clinique-encre mb-4">Tickets</h1>
+
+    <form method="get" class="bg-white rounded-2xl shadow-sm p-4 mb-4 flex flex-col sm:flex-row gap-3">
+        <input type="text" name="q" value="{{ recherche }}" placeholder="Numéro ou nom du patient..."
+               class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-clinique-bleu">
+        <select name="statut" class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-clinique-bleu">
+            <option value="">Tous les statuts</option>
+            <option value="en_attente" {% if statut_filtre == 'en_attente' %}selected{% endif %}>En attente</option>
+            <option value="appele" {% if statut_filtre == 'appele' %}selected{% endif %}>Appelé</option>
+            <option value="traite" {% if statut_filtre == 'traite' %}selected{% endif %}>Traité</option>
+            <option value="annule" {% if statut_filtre == 'annule' %}selected{% endif %}>Annulé</option>
+        </select>
+        <button type="submit" class="bg-clinique-bleu text-white rounded-lg px-4 py-2 text-sm font-medium">Filtrer</button>
+    </form>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+    {% for ticket in tickets %}
+        <a href="{% url 'voir_ticket' ticket.id %}" class="bg-white rounded-2xl shadow-sm overflow-hidden flex hover:shadow-md transition">
+            <div class="flex-1 p-4">
+                <div class="font-display font-semibold text-clinique-encre">{{ ticket.patient.prenom }} {{ ticket.patient.nom }}</div>
+                <div class="text-xs text-clinique-ardoise mt-1">{{ ticket.service.nom }} · {{ ticket.date|date:"d/m/Y H:i" }} · {{ ticket.numero }}</div>
+            </div>
+            <div class="relative w-24 bg-clinique-gris flex flex-col items-center justify-center border-l-2 border-dashed border-gray-300">
+                <div class="font-display font-semibold text-clinique-encre tabular text-sm">{{ ticket.montant }}</div>
+                {% if ticket.statut_file == 'annule' %}
+                <div class="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full mt-1">Annulé</div>
+                {% elif ticket.statut_file == 'appele' %}
+                <div class="text-xs text-clinique-bleu bg-blue-100 px-2 py-0.5 rounded-full mt-1">Appelé</div>
+                {% elif ticket.statut_file == 'traite' %}
+                <div class="text-xs text-green-800 bg-green-100 px-2 py-0.5 rounded-full mt-1">Traité</div>
+                {% else %}
+                <div class="text-xs text-orange-800 bg-orange-100 px-2 py-0.5 rounded-full mt-1">En attente</div>
+                {% endif %}
+            </div>
+        </a>
+    {% empty %}
+        <div class="bg-white rounded-2xl shadow-sm text-sm text-gray-400 text-center py-8 md:col-span-2">Aucun ticket ne correspond à ces critères.</div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}
